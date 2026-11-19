@@ -67,6 +67,15 @@ function stepBar(bar, target, dt, hold = 0.45, drain = 0.9, grow = 2.5) {
 function snapBar(bar, v) { bar.target = bar.fillV = bar.chipV = clamp01(v); bar.hold = 0; bar.wf = bar.wc = -1; }
 function flashBar(bar) { bar.flash.classList.add('on'); bar.flashT = 0.07; }
 
+/** Where the game's source and the fire modules live (the title and the pause menu link to them). */
+const LINKS = Object.freeze({
+  repo: 'https://github.com/lethehaiau/valleyward',
+  fire: 'https://github.com/lethehaiau/firewraith/blob/main/CONTRIBUTING.md',
+});
+/** The GitHub mark (Octicons `mark-github`, MIT, GitHub Inc.), drawn with crisp edges to sit with the pixel HUD. */
+const GH_MARK = '<svg class="ew-ghmark" viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+const outLink = (href, html, cls = '') => `<a class="${cls}" href="${href}" target="_blank" rel="noopener noreferrer">${html}</a>`;
+
 /** The VALLEYWARD pixel wordmark (the night card and the standalone cover share it). */
 const LOGO_HTML = '<div class="ew-logo" aria-label="Valleyward"><span class="ew-logo-x" aria-hidden="true">VALLEYWARD</span><span class="ew-logo-t">VALLEYWARD</span></div>';
 
@@ -78,7 +87,9 @@ const LOGO_HTML = '<div class="ew-logo" aria-label="Valleyward"><span class="ew-
 export function titleCover(el, line = 'CLICK TO BEGIN') {
   if (!el) return;
   el.classList.add('ew-cover');
-  el.innerHTML = `<div class="ew-coverc">${LOGO_HTML}<div class="ew-coversub">THE NIGHT WATCH OF THE LAST LAMPLIGHTER</div><div class="ew-coverline">${esc(line)}</div></div>`;
+  el.innerHTML = `<div class="ew-coverc">${LOGO_HTML}<div class="ew-coversub">THE NIGHT WATCH OF THE LAST LAMPLIGHTER</div><div class="ew-coverline">${esc(line)}</div></div>`
+    + `<nav class="ew-coverlinks" aria-label="Links">${outLink(LINKS.repo, `${GH_MARK}<span>GITHUB</span>`)}`
+    + `${outLink(LINKS.fire, '<span>BUILD YOUR OWN FIRE</span>')}</nav>`;
 }
 
 const CONTROLS = [
@@ -252,6 +263,7 @@ export function createUI(opts = {}) {
   const restartBtn = menuBtns[1], styleBtn = menuBtns[2];
   const styleTog = h('span', 'ew-style', styleBtn, '<span data-s="smooth">SMOOTH</span><span data-s="hybrid">HYBRID</span>');
   h('div', 'ew-hint', menuPanel, 'P or Esc to resume');
+  h('div', 'ew-menulinks', menuPanel, outLink(LINKS.repo, `${GH_MARK}<span>SOURCE ON GITHUB</span>`) + outLink(LINKS.fire, '<span>BUILD YOUR OWN FIRE</span>'));
 
   // controls overlay
   const ctlEl = h('div', 'ew-modal ew-controls', ui);

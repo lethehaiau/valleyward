@@ -969,6 +969,9 @@ function showTitle() {
   }
   const go = (e) => {
     if (e?.type === 'keydown' && (e.code === 'Escape' || e.repeat)) return;
+    // the title's links (the source, the fire-module guide) open in a new tab and do not start the game
+    if (e?.target?.closest?.('a')) return;
+    if (e?.type === 'keydown' && (e.code === 'Enter' || e.code === 'Space') && document.activeElement?.closest?.('#loading a')) return;
     removeEventListener('keydown', go, true);
     cover?.removeEventListener('pointerdown', go);
     begin();

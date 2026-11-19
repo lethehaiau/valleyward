@@ -3,7 +3,7 @@
 //   - nothing in src/ (nor index.html) names a web-root "/assets/…" URL: the build has a relative base, so it can be
 //     served from any path, and asset URLs come from import.meta.env.BASE_URL;
 //   - the object on window.__ew carries every hook of DESIGN §14.8 and every hook the QA tools call;
-//   - the URL parser in src/core reads every documented URL parameter (README "URL parameters");
+//   - the URL parser in src/core reads every documented URL parameter (docs/DEVELOPING.md "URL parameters");
 //   - the sim and the bot stay pure: no three.js, no DOM, no Math.random;
 //   - the eight parts load through import.meta.glob, never through static imports, so any of them may be absent.
 import test from 'node:test';

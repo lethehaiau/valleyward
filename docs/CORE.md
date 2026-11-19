@@ -239,7 +239,7 @@ the fall (2.4 s; time × 0.35 for the first 0.6 s; the card at 1.4 s), retry (1.
 
 ### Hooks and URL parameters
 
-The full lists are in `README.md` ("URL parameters", "Hooks"). Worth knowing beyond them:
+The full lists are in `docs/DEVELOPING.md` ("URL parameters", "Hooks"). Worth knowing beyond them:
 
 - `?noisy=1` (with `?autoplay=1`: the human-reference bot), `?fps=N` (the frame cap; `0` = uncapped), `?cap=N` (the
   horde cap, for measurements), `?night=1..10`, `?ending=1`, `?gpuPerf=1` (GPU timer queries), `?fluidDebug=1` (the

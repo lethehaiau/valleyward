@@ -24,7 +24,7 @@ const licenseNotices = {
 };
 
 // VALLEYWARD: `npm run dev` (port 5350) or `npm run build` → dist/ (relative base, so the build can be served from any
-// path). The bench pages live in preview/ (README.md "Ports").
+// path). The bench pages live in preview/ (docs/DEVELOPING.md "Ports").
 // Firewraith (the fire modules) is a package; with a local checkout linked in (`npm install --no-save ../firewraith`)
 // its real folder is outside this one, so the dev server must be allowed to serve it, and `three` is deduped so a module
 // and the game share one three.js.

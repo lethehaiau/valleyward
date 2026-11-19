@@ -316,6 +316,12 @@ export function buildCss(fontsUrl) {
 #loading .ew-coverline{margin-top:1.6em!important}
 /* the loading bar's step line (index.html): steady, not the title's blinking call to action */
 #loading .ld .ld-step{animation:none;font-size:.5em!important;margin-top:1.3em!important;opacity:.9!important}
+/* the title's links (to the source, and to the guide for writing a fire module): a quiet row in the corner */
+#loading .ew-coverlinks{position:absolute;right:2em;bottom:1.4em;z-index:2;display:flex;gap:1.8em;align-items:center;font-size:.62em;letter-spacing:.2em}
+#loading .ew-coverlinks a,.ew-menulinks a{display:inline-flex;align-items:center;gap:.6em;color:#a4e6ee;text-decoration:none;cursor:pointer;padding:.3em .1em}
+#loading .ew-coverlinks a:hover,#loading .ew-coverlinks a:focus-visible,.ew-menulinks a:hover,.ew-menulinks a:focus-visible{color:#f3f5f1;outline:none;text-decoration:underline;text-underline-offset:.35em}
+.ew-ghmark{width:1.6em;height:1.6em;flex:none}
+.ew-menulinks{display:flex;justify-content:center;gap:1.4em;margin-top:.9em;font-size:.55em;letter-spacing:.15em;pointer-events:auto}
 #loading::marker{content:none}
 
 @keyframes ew-xptick{0%{filter:brightness(1.9)}100%{filter:brightness(1)}}

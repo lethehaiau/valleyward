@@ -24,7 +24,7 @@ I–IX, the Rainmother Night X (§6); her fall plays the ending (§12).
 
 ### 1.3 Where the rest lives
 Numbers: `src/sim/constants.js`, `src/shared/meta.js`, `src/shared/arena.js` and the constants of `src/sim/*.js`.
-Controls, URL parameters and hooks: `README.md`. Story and hints (binding for every text): `docs/STORY.md`. The look:
+Controls, URL parameters and hooks: `docs/DEVELOPING.md`. Story and hints (binding for every text): `docs/STORY.md`. The look:
 `docs/ART-DIRECTION.md` and the key art `docs/mockups/`. The fire: `docs/FLUID.md` and decision
 `docs/decisions/0001-fire-modules-and-two-editions.md`. Subsystems: `docs/CORE.md` (with the balance and performance
 results), `ENV.md`, `ACTORS.md`, `PRES.md`, `AUDIO.md`.
@@ -50,7 +50,7 @@ What they truly are is only hinted (`docs/STORY.md`) until the ending.
 - Walk 6 m/s, sprint 9, jump 1.1 m (`PLAYER`); FOV 78°, eye 1.68 m. The ground, the stair and the wall walk; a fall
   guard returns the player to the last safe spot.
 - Mouse and WASD; E kindles the beacon and acts at the camp; Q the Sunburst; G or right click a firebomb. The full
-  table: `README.md`.
+  table: `docs/DEVELOPING.md`.
 
 ### 3.3 Immune to fire
 The Lamplighter takes no fire damage anywhere; fire at the feet only warms the viewmodel. It is the first hint of the
@@ -277,7 +277,7 @@ great after upgrades** (`TOWERS`).
 ### 9.7 The save
 `localStorage` key `valleyward.save.v1` (`SAVE_KEY`); every access in try/catch, memory in Node; `normalizeSave`
 validates it. It keeps the permanent items of §9.1, `ended`, and the run in progress between nights, so a reload
-resumes at the camp. Presets (`?save=fresh|mid|rich|late|endgame`): `README.md`.
+resumes at the camp. Presets (`?save=fresh|mid|rich|late|endgame`): `docs/DEVELOPING.md`.
 
 ## 10. Level-up cards and skills
 The pool: `CARDS` in `src/sim/cards.js`.
@@ -449,7 +449,7 @@ is the catalogue: add types, never rename or remove one. Busy types are batched 
 5. Bloom, then one output pass: exposure, grade, tone map, dawn grade, vignette, hurt edge, flash. No SSR, TAA or DOF.
 
 ### 14.8 Hooks, URL parameters and presets
-Tools, tests and captures drive the game through `window.__ew` and URL parameters (`README.md`; checked by
+Tools, tests and captures drive the game through `window.__ew` and URL parameters (`docs/DEVELOPING.md`; checked by
 `tests/static.test.mjs`). For the campaign: `?night=1..10`, `?save=late|endgame`, `?ending=1`, `__ew.goto(...)`.
 
 ## 15. Performance budgets
