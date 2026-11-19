@@ -5,7 +5,7 @@ Valleyward uses three licences. Which one applies depends on the file:
 | What | Where | Licence |
 |---|---|---|
 | Source code, shaders, tools, tests and technical documentation | everything not listed below | [MIT](LICENSE) |
-| Original game art | `public/assets/sprites/*.png`, `*.webp`; `public/assets/tex/*.webp`; `public/assets/models/viewmodel/*.png`; `public/assets/ui/*.png`; `docs/mockups/*.jpg`; the screenshots in `docs/assets/` | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) |
+| Original game art | `public/assets/sprites/*.png`, `*.webp`; `public/assets/tex/*.webp`; `public/assets/models/viewmodel/*.png`; `public/assets/ui/*.png`; `src/ui/cursor-*.png`; `docs/mockups/*.jpg`; the screenshots in `docs/assets/` | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) |
 | Original narrative content | `docs/STORY.md`, and the story text, dialogue and on-screen lines in the game (for example Brother Cinder's lines, the night and dawn cards and the ending) wherever they appear, including inside source files | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) |
 | Fonts | `public/assets/fonts/*.woff2` | [SIL Open Font License 1.1](#third-party-material) |
 
