@@ -50,14 +50,14 @@ export function buildCssV2() {
 .ew-sgold b{font-weight:400;color:#f6e7a0}
 .ew-sgold.bump b{animation:ew-bump .3s ease}
 .ew-tabs{display:flex;gap:.35em;margin:.8em 0 .5em;border-bottom:var(--p) solid #3a3128}
-.ew-tab{font:inherit;font-size:.62em;letter-spacing:.16em;color:var(--dim);background:#14171b;border:var(--p) solid #3a3128;border-bottom:0;padding:.5em .9em .45em;cursor:pointer}
+.ew-tab{font:inherit;font-size:.62em;letter-spacing:.16em;color:var(--dim);background:#14171b;border:var(--p) solid #3a3128;border-bottom:0;padding:.5em .9em .45em;cursor:var(--ew-cursor-action,pointer)}
 .ew-tab.on{color:var(--line);background:#e0b878;border-color:#e0b878;text-shadow:none}
 .ew-sbody{display:flex;flex-direction:column;gap:.22em;overflow:auto;min-height:0}
 .ew-srow,.ew-crow2{font:inherit;color:inherit;display:grid;grid-template-columns:1.5em 2.1em 6.6em 1fr 4em;align-items:center;column-gap:.5em;text-align:left;
-  padding:.32em .45em;background:rgba(255,255,255,.02);border:var(--p) solid transparent;cursor:pointer;transition:background .12s,border-color .12s,transform .12s}
+  padding:.32em .45em;background:rgba(255,255,255,.02);border:var(--p) solid transparent;cursor:var(--ew-cursor-action,pointer);transition:background .12s,border-color .12s,transform .12s}
 .ew-srow .ew-key,.ew-crow2 .ew-key,.ew-tcard .ew-key{font-size:.55em;min-width:1.7em;height:1.7em}
 .ew-srow.sel,.ew-crow2.sel{background:rgba(224,184,120,.12);border-color:#e0b878}
-.ew-srow.dis,.ew-crow2.dis{cursor:default}
+.ew-srow.dis,.ew-crow2.dis{cursor:var(--ew-cursor,default)}
 .ew-srow.dis .ew-sicon,.ew-srow.dis .ew-sname,.ew-crow2.dis .ew-sicon{opacity:.5}
 .ew-srow.bump,.ew-crow2.bump,.ew-tcard.bump{animation:ew-shopbump .35s ease}
 .ew-srow.deny,.ew-crow2.deny,.ew-tcard.deny{animation:ew-deny .3s steps(4)}
@@ -98,7 +98,7 @@ export function buildCssV2() {
 .ew-shop.pad .ew-skick{font-size:.7em;color:#e0b878}
 .ew-tcards{display:flex;gap:.8em;margin-top:.9em}
 .ew-tcards.one{justify-content:center}
-.ew-tcard{font:inherit;color:inherit;flex:1;max-width:13em;display:flex;flex-direction:column;align-items:center;gap:.5em;padding:.8em .7em .8em;text-align:center;cursor:pointer;
+.ew-tcard{font:inherit;color:inherit;flex:1;max-width:13em;display:flex;flex-direction:column;align-items:center;gap:.5em;padding:.8em .7em .8em;text-align:center;cursor:var(--ew-cursor-action,pointer);
   background:linear-gradient(180deg,#1c1f24,#121418);border:var(--p) solid #3a3128;box-shadow:0 0 0 var(--p) var(--line);transition:border-color .12s,transform .12s}
 .ew-tcard.sel{border-color:#e0b878;transform:translateY(-.2em)}
 .ew-tcard.obelisk.sel{border-color:#c79bff}
@@ -136,7 +136,7 @@ export function buildCssV2() {
 /* the camp: BEGIN NIGHT (bottom centre), its tip, and the bottom-centre stack above it (toasts, then the E prompt) */
 .ew-begin{position:absolute;left:50%;bottom:1.1em;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:.45em;white-space:nowrap}
 .ew-begin.on{display:flex}
-.ew-beginbtn{font:inherit;pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:.5em;padding:.45em .9em .45em .5em;font-size:.9em;letter-spacing:.12em;color:#fff3d6;
+.ew-beginbtn{font:inherit;pointer-events:auto;cursor:var(--ew-cursor-action,pointer);display:flex;align-items:center;gap:.5em;padding:.45em .9em .45em .5em;font-size:.9em;letter-spacing:.12em;color:#fff3d6;
   background:linear-gradient(180deg,#5a2a14,#3a180c);border:var(--p) solid #e0b878;box-shadow:0 0 0 var(--p) var(--line),0 calc(var(--p) * 3) 0 #1c0c06,0 0 1.2em rgba(255,154,46,.25);
   animation:ew-beginglow 2.2s ease-in-out infinite}
 .ew-beginbtn b{font-weight:400}

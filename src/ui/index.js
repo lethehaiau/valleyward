@@ -306,7 +306,7 @@ export function createUI(opts = {}) {
   let subUntil = 0;
   let menuOpen = false, ctlOpen = false, menuSel = 0, hoverArmed = false, restartArmedUntil = 0;
   /** @type {((v: string) => void) | null} */ let menuResolve = null;
-  /** @type {null | { ids: string[], els: HTMLElement[], sel: number, resolve: (id: string) => void, openedAt: number, done: boolean }} */
+  /** @type {null | { ids: string[], els: HTMLElement[], sel: number, resolve: (id: string) => void, onPick?: (id: string, event: Event) => void, openedAt: number, done: boolean }} */
   let cardsState = null;
   /** @type {null | { kind: string, resolve: (v: any) => void, buttons: HTMLButtonElement[], sel: number, auto: number, done: boolean }} */
   let endState = null;
@@ -498,18 +498,21 @@ export function createUI(opts = {}) {
 
   // ------------------------------------------------------------------------------------------------ level-up cards
   function paintCards() { if (cardsState) cardsState.els.forEach((el, i) => setClass(el, 'sel', i === cardsState?.sel)); }
-  function pickCard(i) {
+  /** @param {number} i @param {Event} [event] */
+  function pickCard(i, event = undefined) {
     const c = cardsState;
     if (!c || c.done || i < 0 || i >= c.ids.length) return;
     if (now() - c.openedAt < 0.3) return; // a held key or click from play must not pick
     c.done = true;
+    cardsEl.inert = true;
     c.els.forEach((el, j) => el.classList.add(j === i ? 'picked' : 'gone'));
     sound('pick');
     const id = c.ids[i];
-    emit('card-picked', id); // synchronous, inside the click / key gesture: main.js may re-take the pointer lock here
-    schedule(0.3, () => { setClass(cardsEl, 'on', false); });
+    emit('card-picked', id);
+    schedule(0.3, () => { if (cardsState === c) setClass(cardsEl, 'on', false); });
     schedule(0.65, () => { if (cardsState === c) { cardsState = null; crow.innerHTML = ''; } });
     c.resolve(id);
+    if (event) c.onPick?.(id, event);
   }
   /** DESIGN §10.2: { lv, max } for a skill card (null for a stat card). The level the player has now: state.player.skills,
    *  .cardLevels, or the count of picks in state.stats.cards; the class and max: the sim's cardDefs, else SKILL_CARDS. */
@@ -525,8 +528,8 @@ export function createUI(opts = {}) {
     if (def?.kind === 'unlock') lv = 0; else if (def?.kind === 'upgrade') lv = Math.max(1, lv);
     return { lv: Math.max(0, lv | 0), max };
   }
-  /** @param {string[]} ids @returns {Promise<string>} */
-  function cards(ids) {
+  /** @param {string[]} ids @param {(id: string, event: Event) => void} [onPick] @returns {Promise<string>} */
+  function cards(ids, onPick) {
     ids = (Array.isArray(ids) ? ids : []).slice(0, 3).map(String);
     if (!ids.length) return Promise.resolve('');
     if (cardsState && !cardsState.done) { const prev = cardsState; prev.done = true; prev.resolve(prev.ids[0]); }
@@ -549,13 +552,12 @@ export function createUI(opts = {}) {
           + `<div class="ew-cname ew-ts">${esc(fitText(d.name.toUpperCase()))}</div><div class="ew-ctext">${esc(fitText(d.text))}</div>`
           + `<div class="ew-ckey"><span class="ew-key">${i + 1}</span></div>`;
         el.addEventListener('mousemove', (e) => { if (!cardsState || cardsState.sel === i || Math.abs(e.movementX) + Math.abs(e.movementY) === 0) return; cardsState.sel = i; paintCards(); sound('move'); });
-        el.addEventListener('click', (e) => { e.stopPropagation(); if (cardsState) { cardsState.sel = i; pickCard(i); } });
+        el.addEventListener('click', (e) => { e.stopPropagation(); if (cardsState) { cardsState.sel = i; pickCard(i, e); } });
         return el;
       });
-      cardsState = { ids, els, sel: 1 < ids.length ? 1 : 0, resolve, openedAt: now(), done: false };
-      cardsState.sel = 0;
+      cardsState = { ids, els, sel: 0, resolve, onPick, openedAt: now(), done: false };
       paintCards();
-      freePointer();
+      cardsEl.inert = false;
       setClass(cardsEl, 'on', false); void cardsEl.offsetWidth; setClass(cardsEl, 'on', true);
       sound('card');
     });
@@ -689,13 +691,13 @@ export function createUI(opts = {}) {
     if (panels.isOpen && !(endState && !endState.done) && !(cardsState && !cardsState.done) && panels.onKey(e)) return;
     if (cardsState && !cardsState.done) {
       const n = k === 'Digit1' || k === 'Numpad1' ? 0 : k === 'Digit2' || k === 'Numpad2' ? 1 : k === 'Digit3' || k === 'Numpad3' ? 2 : -1;
-      if (n >= 0) { e.preventDefault(); e.stopPropagation(); if (!e.repeat) { cardsState.sel = n; paintCards(); pickCard(n); } return; }
+      if (n >= 0) { e.preventDefault(); e.stopPropagation(); if (!e.repeat) { cardsState.sel = n; paintCards(); pickCard(n, e); } return; }
       if (k === 'ArrowLeft' || k === 'KeyA' || k === 'ArrowRight' || k === 'KeyD') {
         e.preventDefault(); e.stopPropagation();
         const d = k === 'ArrowLeft' || k === 'KeyA' ? -1 : 1;
         cardsState.sel = (cardsState.sel + d + cardsState.ids.length) % cardsState.ids.length; paintCards(); sound('move'); return;
       }
-      if (k === 'Enter' || k === 'NumpadEnter') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) pickCard(cardsState.sel); return; }
+      if (k === 'Enter' || k === 'NumpadEnter') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) pickCard(cardsState.sel, e); return; }
       if (k === 'KeyP' || k === 'KeyH' || k === 'Space' || k === 'KeyE' || k === 'KeyQ' || k === 'KeyR' || k === 'KeyG') { e.preventDefault(); e.stopPropagation(); return; }
       return;
     }

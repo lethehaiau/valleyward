@@ -237,10 +237,10 @@ function gameKey(e) {
     return;
   }
   if (code === 'KeyH' && fallbackHud) { e.preventDefault(); toggleMenu(); return; }
-  if (mode !== 'cards' || !/^Digit[123]$/.test(code)) return;
+  if (mode !== 'cards' || !/^(Digit|Numpad)[123]$/.test(code)) return;
   e.preventDefault();
-  const k = Number(code.slice(5));
-  if (!uiApi.pickKey?.(k)) sim.pickCard(k);
+  const k = Number(code.at(-1));
+  if (!uiApi.pickKey?.(k, e)) sim.pickCard(k);
 }
 function trySkip() {
   const st = sim.state;
@@ -359,12 +359,26 @@ const FLASHES = new Map([
   [EV.SUNBURST, [[1, 0.75, 0.4], 0.4, 0.5]],
   [EV.BARREL_BURST, [[1, 0.6, 0.3], 0.18, 0.3]],
 ]);
+function showUpgrade(ev) {
+  const st = sim.state;
+  const offer = st.mode === 'cards' && st.player.level === ev.level ? st.cards : null;
+  const restoreLock = !!offer && input.releaseLock();
+  if (offer) input.enabled = false;
+
+  function picked(id, event) {
+    if (!offer || sim.state.cards !== offer || !sim.pickCard(id)) return;
+    if (!event?.isTrusted) return;
+    focusCanvas();
+    if (restoreLock && !isPaused() && !uiApi.modal && !botOn && !override && rig.view === 'play') input.tryLock();
+  }
+  // A failed UI call switches the facade to the fallback HUD for the same offer.
+  const choice = uiApi.cards(ev.cards, picked) ?? uiApi.cards(ev.cards, picked);
+  Promise.resolve(choice).then((id) => { if (id) picked(id); });
+}
 /** The core's own reactions to an event: cutscenes, the cards, the camp's panels, the hurt time. */
 const REACTIONS = new Map([
   [EV.MODE, (ev, st) => modeChanged(ev.mode, ev.prev, st)],
-  [EV.LEVEL_UP, (ev) => {
-    Promise.resolve(uiApi.cards(ev.cards)).then((id) => { if (id && sim.state.mode === 'cards') sim.pickCard(id); });
-  }],
+  [EV.LEVEL_UP, showUpgrade],
   [EV.CARD_PICK, (ev) => { if (uiApi.cardsOpen) uiApi.choose(ev.cardId); }],
   [EV.T_ARRIVE, (ev, st) => playCinema('troll', st)],
   [EV.DAWN, (ev, st) => { dawnT = 0; playCinema('dawn', st); }],
@@ -643,7 +657,7 @@ function frame(now) {
   overlay.frame(elapsed * 1000);
   syncUiModal();
   const paused = isPaused();
-  input.enabled = ready && !paused;
+  input.enabled = ready && !paused && sim.state.mode !== 'cards';
   const f = gatherInput(paused);
   if (!botOn && !override && rig.view === 'play' && lookIsFree()) rig.turn(f.lookX, f.lookY, SENS);
 
@@ -964,7 +978,7 @@ function showTitle() {
   titleUp = true;
   if (cover) {
     cover.innerHTML = TITLE_HTML;
-    cover.style.cursor = 'pointer';
+    cover.style.cursor = 'var(--ew-cursor-action, pointer)';
     try { uiApi.titleCover?.(cover); } catch (e) { console.warn('[ew] ui.titleCover', e); }
   }
   const go = (e) => {

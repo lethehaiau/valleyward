@@ -1,10 +1,11 @@
 // VALLEYWARD end to end, on a production build (vite build, then vite preview). Run it under the GPU lock:
-//   tools/gpu-lock.sh node tools/qa/e2e.mjs [--port 5358] [--seed 2] [--speed 4] [--only entry,probe,views,night,v2,v3,v4,editions] [--no-build]
+//   tools/gpu-lock.sh node tools/qa/e2e.mjs [--port 5358] [--seed 2] [--speed 4] [--only entry,probe,upgrades,views,night,v2,v3,v4,editions] [--no-build]
 // One headless Chrome (tools/platform.mjs) and one preview server, both closed at the end. The stages, in order:
 //   entry     the title cover, a click, the intro, Space after 2 s skips it, play (the route a player takes)
 //   probe     the first seconds of input: W / A / S / D move within a frame or two and stop on release, a click fires,
 //             3 takes the Lance, G throws a firebomb, E at the pan kindles, P pauses (the sim clock holds) and resumes,
 //             the fire style switches live
+//   upgrades  mouse and keyboard card picks restore capture, consecutive offers stay visible, one denial can recover
 //   views     m1 / m2 / top in the greybox (?look=greybox) and with every module, the HUD
 //   night     the self-play night (?autoplay=1&speed=4) to victory or a fall, captured at its key moments; the card → the camp
 //   v2        DESIGN §9: the camp (Brother Cinder's panel, a buy, a pad's panel, two towers built and one upgraded, the save
@@ -22,6 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { startPreview, launch, openPage, waitFor, sleep, meanLuma, ROOT } from './browser.mjs';
 import { TIMELINE } from '../../src/shared/timeline.js';
+import { XP_NEXT } from '../../src/sim/constants.js';
 
 // ---- options -------------------------------------------------------------------------------------------------------
 const cli = process.argv.slice(2);
@@ -172,6 +174,69 @@ async function probeStage() {
   await page.close();
 }
 
+async function upgradesStage() {
+  const { page, errors } = await openPage(browser, `${base}?seed=${SEED}&save=fresh&skipintro=1&god=1&mute=1&look=greybox`);
+  if (!await waitFor(page, () => __ew.assetsReady() && !document.getElementById('loading'), null, 120000)) {
+    check('upgrades.ready', false, { errors });
+    await page.close();
+    return;
+  }
+  await page.evaluate(() => {
+    // Headless platforms vary in native lock support. Keep real click/key gestures and control the browser's response.
+    const canvas = document.querySelector('#world canvas');
+    const probe = window.upgradeLock = { requests: 0, reject: false };
+    let locked = null;
+    const change = (el) => { locked = el; document.dispatchEvent(new Event('pointerlockchange')); };
+    Object.defineProperty(document, 'pointerLockElement', { get: () => locked });
+    document.exitPointerLock = () => change(null);
+    canvas.requestPointerLock = async () => {
+      probe.requests++;
+      if (probe.reject || !navigator.userActivation.isActive) throw new DOMException('Capture denied', 'NotAllowedError');
+      await Promise.resolve();
+      change(canvas);
+    };
+  });
+  const state = () => page.evaluate(() => ({
+    locked: document.pointerLockElement?.tagName === 'CANVAS', focused: document.activeElement?.tagName === 'CANVAS',
+    requests: window.upgradeLock.requests, mode: __ew.state().mode, upgrades: __ew.state().stats.cards.length,
+    shots: __ew.state().stats.shots, visible: !!document.querySelector('.ew-cards.on:not([inert])'),
+  }));
+  const waitOffer = () => waitFor(page, () => __ew.state().mode === 'cards' && __ew.ui().cardsOpen, null, 4000, 50);
+  const cards = '.ew-cards.on:not([inert]) .ew-card';
+  await page.mouse.click(640, 360);
+  const initial = await state();
+  await page.evaluate(() => { const p = __ew.state().player; p.xp = p.xpNext; });
+  await waitOffer();
+  const opened = await state();
+  await sleep(320);
+  await page.click(cards);
+  const mouse = await state();
+  check('upgrades.mouseResume', initial.locked && opened.visible && !opened.locked && mouse.mode === 'play' && mouse.locked
+    && mouse.focused && mouse.upgrades === 1 && mouse.requests === initial.requests + 1 && mouse.shots === initial.shots, { initial, opened, mouse });
+
+  await page.evaluate((nextXp) => { const p = __ew.state().player; p.xp = p.xpNext + nextXp; }, XP_NEXT(3));
+  await waitOffer();
+  await sleep(320);
+  await page.keyboard.press('Digit1');
+  await waitOffer();
+  await sleep(340);  // past the previous offer's closing animation
+  const again = await state();
+  check('upgrades.consecutive', again.mode === 'cards' && again.visible && !again.locked && again.upgrades === 2
+    && again.requests === mouse.requests + 1, again);
+
+  await page.evaluate(() => { window.upgradeLock.reject = true; });
+  await page.keyboard.press('Digit2');
+  const denied = await state();
+  await page.evaluate(() => { window.upgradeLock.reject = false; });
+  await waitFor(page, () => !__ew.busy, null, 4000);
+  await page.mouse.click(640, 360);
+  const retry = await state();
+  check('upgrades.retry', denied.mode === 'play' && denied.upgrades === 3 && !denied.visible && !denied.locked
+    && denied.requests === again.requests + 1 && retry.locked && retry.requests === denied.requests + 1 && errors.length === 0,
+  { denied, retry, errors });
+  await page.close();
+}
+
 try {
   // ------------------------------------------------------------------------------------------ 1. entry
   if (want('entry')) {
@@ -196,6 +261,7 @@ try {
 
   // ------------------------------------------------------------------------------------------ 2. the first seconds of input
   if (want('probe')) await probeStage();
+  if (want('upgrades')) await upgradesStage();
 
   // ------------------------------------------------------------------------------------------ 3. views
   for (const [name, q] of want('views') ? [['m1_greybox', 'look=greybox&view=m1'], ['m2_greybox', 'look=greybox&view=m2'], ['m1_full', 'view=m1'], ['m2_full', 'view=m2'], ['top_full', 'view=top']] : []) {

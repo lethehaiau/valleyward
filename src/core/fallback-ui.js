@@ -23,7 +23,7 @@ const RULES = [
   [' .card p', 'margin:0;opacity:.85'],
   [' .cards', 'display:flex;gap:14px;justify-content:center'],
   [' .cards button', 'width:190px;min-height:110px;text-align:left'],
-  [' button', 'pointer-events:auto;font:inherit;color:#eef6f7;background:#16313d;border:1px solid #9ee1e9;padding:10px 16px;cursor:pointer'],
+  [' button', 'pointer-events:auto;font:inherit;color:#eef6f7;background:#16313d;border:1px solid #9ee1e9;padding:10px 16px;cursor:var(--ew-cursor-action,pointer)'],
   [' button:hover', 'background:#21495a'],
   [' .hud', 'transition:opacity .3s'],
   ['.nohud .hud', 'opacity:0'],
@@ -80,36 +80,37 @@ export function createFallbackUI({ root, onAction } = {}) {
   (root || document.body).appendChild(shell);
 
   // ---- the cards: one open at a time; opening another resolves the first with null
-  let open = null;   // { el, done(value), picks: the level-up buttons in order }
-  function dismiss(value) {
+  let open = null;   // { el, done(value), picks: the level-up buttons in order, onPick }
+  function dismiss(value, event) {
     const was = open;
     if (!was) return;
     open = null;
     was.el.remove();
     was.done(value);
+    if (event) was.onPick?.(value, event);
   }
-  function showCard(build) {
+  function showCard(build, onPick) {
     if (open) dismiss(null);
     return new Promise((resolve) => {
       const el = make('div', 'card'), picks = [];
-      open = { el, done: resolve, picks };
+      open = { el, done: resolve, picks, onPick };
       build(el, picks);
       shell.appendChild(el);
     });
   }
   /** Level-up: one button per card id; resolves the id picked. */
-  const cards = (ids) => showCard((el, picks) => {
+  const cards = (ids, onPick) => showCard((el, picks) => {
     const row = make('div', 'cards');
     ids.forEach((id, k) => {
       const def = CARD_BY_ID[id], button = make('button');
       button.dataset.id = id;
       button.append(make('b', '', `${k + 1} · ${def?.name || id}`), make('br'), make('br'), def?.text || '');
-      button.onclick = () => dismiss(button.dataset.id);
+      button.onclick = (event) => dismiss(id, event);
       row.appendChild(button);
       picks.push(button);
     });
     el.append(make('h1', '', 'LEVEL UP'), row);
-  });
+  }, onPick);
   /** The night card resolves at once; dawn and fallen show the stats and resolve 'retry'. */
   function card(kind, st) {
     if (open) dismiss(null);
@@ -201,11 +202,12 @@ export function createFallbackUI({ root, onAction } = {}) {
     cards, card, menu,
     setFireStyle(s) { style = s; renderMenu(); },
     get modal() { return menuShown; },
+    get cardsOpen() { return !!open?.picks.length; },
     /** Pick level-up card k (1..3) by key while the cards are up. */
-    pickKey(k) {
+    pickKey(k, event) {
       const button = open?.picks[k - 1];
       if (!button) return false;
-      dismiss(button.dataset.id);
+      dismiss(button.dataset.id, event);
       return true;
     },
     choose(v) {

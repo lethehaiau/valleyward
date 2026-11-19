@@ -210,7 +210,7 @@ export function buildCss(fontsUrl) {
 .ew-ptitle{font-size:1.2em;letter-spacing:.12em;text-align:center}
 .ew-pkick{font-size:.55em;letter-spacing:.3em;color:var(--dim);text-align:center;margin-bottom:.6em}
 .ew-items{display:flex;flex-direction:column;gap:.3em;margin-top:.9em;min-width:15em}
-.ew-item{font:inherit;font-size:.8em;letter-spacing:.1em;color:var(--ink2);background:transparent;border:0;text-align:left;padding:.55em .8em .55em 1.6em;position:relative;cursor:pointer;white-space:nowrap;
+.ew-item{font:inherit;font-size:.8em;letter-spacing:.1em;color:var(--ink2);background:transparent;border:0;text-align:left;padding:.55em .8em .55em 1.6em;position:relative;cursor:var(--ew-cursor-action,pointer);white-space:nowrap;
   transition:color .15s,background .15s,transform .15s}
 .ew-item::before{content:'';position:absolute;left:.6em;top:50%;width:.45em;height:.45em;margin-top:-.225em;background:var(--cyan);transform:scale(0);transition:transform .15s}
 .ew-item.sel{color:var(--ink);background:rgba(164,230,238,.1);transform:translateX(.2em)}
@@ -235,7 +235,7 @@ export function buildCss(fontsUrl) {
 .ew-csub{font-family:'EW Pixelify',monospace;font-size:.68em;color:var(--ink2);margin-bottom:1.1em}
 .ew-crow{display:flex;gap:1.1em}
 .ew-card{font:inherit;color:inherit;position:relative;width:9.6em;min-height:13em;padding:1em .8em .9em;background:linear-gradient(180deg,#1d2a33,#141e25);border:var(--p) solid var(--edge);
-  box-shadow:0 0 0 var(--p) var(--line),inset 0 0 0 var(--p) #2f414c,0 .6em 0 rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;cursor:pointer;text-align:center;
+  box-shadow:0 0 0 var(--p) var(--line),inset 0 0 0 var(--p) #2f414c,0 .6em 0 rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;cursor:var(--ew-cursor-action,pointer);text-align:center;
   transition:transform .16s,border-color .16s,background .16s,box-shadow .16s}
 .ew-cards.on .ew-card{animation:ew-cardin .42s cubic-bezier(.2,.9,.25,1.15) backwards}
 .ew-cards.on .ew-card:nth-child(2){animation-delay:.08s}.ew-cards.on .ew-card:nth-child(3){animation-delay:.16s}
@@ -263,7 +263,7 @@ export function buildCss(fontsUrl) {
 .ew-estats span{font-size:.45em;letter-spacing:.24em;color:var(--dim)}
 .ew-ebtns{display:flex;gap:.8em;margin-top:1.5em;opacity:0}
 .ew-btn{font:inherit;font-size:.72em;letter-spacing:.1em;color:var(--ink2);background:#121b21;border:var(--p) solid var(--edge);box-shadow:0 0 0 var(--p) var(--line),0 calc(var(--p) * 3) 0 #0a1014;
-  padding:.65em 1.1em;cursor:pointer;transition:color .15s,background .15s,transform .15s,border-color .15s;white-space:nowrap}
+  padding:.65em 1.1em;cursor:var(--ew-cursor-action,pointer);transition:color .15s,background .15s,transform .15s,border-color .15s;white-space:nowrap}
 .ew-btn.sel{color:var(--line);background:var(--ink);border-color:var(--ink);transform:translateY(calc(var(--p) * -2))}
 .ew-btn:active{transform:translateY(var(--p))}
 .ew-end.on .ew-ekick{animation:ew-fadein .6s .1s ease both}
@@ -318,7 +318,7 @@ export function buildCss(fontsUrl) {
 #loading .ld .ld-step{animation:none;font-size:.5em!important;margin-top:1.3em!important;opacity:.9!important}
 /* the title's links (to the source, and to the guide for writing a fire module): a quiet row in the corner */
 #loading .ew-coverlinks{position:absolute;right:2em;bottom:1.4em;z-index:2;display:flex;gap:1.8em;align-items:center;font-size:.62em;letter-spacing:.2em}
-#loading .ew-coverlinks a,.ew-menulinks a{display:inline-flex;align-items:center;gap:.6em;color:#a4e6ee;text-decoration:none;cursor:pointer;padding:.3em .1em}
+#loading .ew-coverlinks a,.ew-menulinks a{display:inline-flex;align-items:center;gap:.6em;color:#a4e6ee;text-decoration:none;cursor:var(--ew-cursor-action,pointer);padding:.3em .1em}
 #loading .ew-coverlinks a:hover,#loading .ew-coverlinks a:focus-visible,.ew-menulinks a:hover,.ew-menulinks a:focus-visible{color:#f3f5f1;outline:none;text-decoration:underline;text-underline-offset:.35em}
 .ew-ghmark{width:1.6em;height:1.6em;flex:none}
 .ew-menulinks{display:flex;justify-content:center;gap:1.4em;margin-top:.9em;font-size:.55em;letter-spacing:.15em;pointer-events:auto}

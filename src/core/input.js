@@ -38,8 +38,9 @@ export function createInput(o) {
   const { canvas, onGesture, onKey } = o;
   const down = new Set(), pressed = new Set();
   let dx = 0, dy = 0, notches = 0, lastNotch = 0;
-  let active = true, refused = false;
-  /** @type {{ x: number, y: number, moved: number } | null} */
+  let active = true, refused = typeof canvas.requestPointerLock !== 'function';
+  let wantsLock = false, pendingLock = null;
+  /** @type {{ x: number, y: number, moved: number, released: boolean } | null} */
   let drag = null;
   // DESIGN §15: right after a pointer lock some systems send one huge jump (a Chrome quirk)
   let lockedAt = -1e9, checkedSinceLock = 0;
@@ -54,14 +55,38 @@ export function createInput(o) {
     down.add(action);
     if (ONE_SHOT.has(action)) pressed.add(action);
   }
-  function clear() { down.clear(); pressed.clear(); resetMotion(); drag = null; }
+  function clear() {
+    down.clear(); pressed.clear(); resetMotion(); drag = null;
+    if (pendingLock) pendingLock.onFailure = undefined;
+  }
 
-  function tryLock() {
-    if (refused || lockedHere() || !canvas.requestPointerLock) return;
+  function lockFailed(request) {
+    if (pendingLock !== request) return;
+    pendingLock = null;
+    refused = true;
+    if (active) request.onFailure?.();
+  }
+  /** @param {() => void} [onFailure] */
+  function tryLock(onFailure = undefined) {
+    if (typeof canvas.requestPointerLock !== 'function') return;
+    wantsLock = true;
+    if (lockedHere() || pendingLock) return;
+    const request = { legacy: true, onFailure };
+    pendingLock = request;
     try {
       const ask = canvas.requestPointerLock();
-      if (ask && typeof ask.catch === 'function') ask.catch(() => { refused = true; });
-    } catch { refused = true; }
+      if (ask && typeof ask.catch === 'function') {
+        request.legacy = false;
+        ask.catch(() => lockFailed(request));
+      }
+    } catch { lockFailed(request); }
+  }
+  function releaseLock() {
+    const wasCapturing = lockedHere() || (wantsLock && pendingLock !== null);
+    wantsLock = false;
+    if (pendingLock) pendingLock.onFailure = undefined;
+    try { if (lockedHere()) document.exitPointerLock(); } catch { /* lock already lost */ }
+    return wasCapturing;
   }
 
   function keyDown(e) {
@@ -87,16 +112,23 @@ export function createInput(o) {
     if (e.button === RIGHT) { pressed.add('bomb'); return; }   // RMB: a firebomb
     if (e.button !== LEFT) return;
     if (lockedHere()) { hold('fire'); return; }
-    // unlocked: the first click asks for the lock and does not shoot; once refused, a drag looks and a click fires
-    drag = { x: e.clientX, y: e.clientY, moved: 0 };
-    if (refused) hold('fire'); else tryLock();
+    const mouse = drag = { x: e.clientX, y: e.clientY, moved: 0, released: false };
+    if (!canvas.requestPointerLock) { hold('fire'); return; }
+    // After a refusal, an unlocked click fires if the retry is also refused and the mouse did not drag.
+    tryLock(refused ? () => {
+      if (mouse.moved > DRAG_FIRE_PX) return;
+      if (drag === mouse) hold('fire');
+      else if (mouse.released) pressed.add('fire');
+    } : undefined);
   }
   function buttonUp(e) {
     if (e.button !== LEFT) return;
     down.delete('fire');
+    if (drag) drag.released = true;
     drag = null;
   }
   function moved(e) {
+    if (!active) return;
     if (lockedHere()) {
       const step = { x: e.movementX || 0, y: e.movementY || 0 }, size = Math.hypot(step.x, step.y);
       if (checkedSinceLock < LOCK_CHECKED && performance.now() - lockedAt < LOCK_SETTLE_MS) {
@@ -113,19 +145,26 @@ export function createInput(o) {
     drag.moved += Math.abs(ddx) + Math.abs(ddy);
     drag.x = e.clientX; drag.y = e.clientY;
     look(ddx, ddy);
-    if (refused && drag.moved > DRAG_FIRE_PX) down.delete('fire');   // it was a look, not a shot
+    if (refused && drag.moved > DRAG_FIRE_PX) { down.delete('fire'); pressed.delete('fire'); }
   }
   function wheeled(e) {
     if (e.ctrlKey) return;   // (pinch zoom)
     e.preventDefault();
+    if (!active) return;
     if (!isNotch(e)) { look(e.deltaX * SWIPE_SCALE, e.deltaY * SWIPE_SCALE); return; }
     const t = performance.now();
-    if (!active || t - lastNotch <= NOTCH_GAP_MS) return;
+    if (t - lastNotch <= NOTCH_GAP_MS) return;
     notches += Math.sign(e.deltaY);
     lastNotch = t;
   }
   function lockChanged() {
-    if (!lockedHere()) return;
+    if (!lockedHere()) { down.delete('fire'); drag = null; resetMotion(); return; }
+    const request = pendingLock;
+    pendingLock = null;
+    refused = false;
+    // A request already in flight can land after an overlay has opened.
+    if (request && !wantsLock) { releaseLock(); return; }
+    drag = null;
     lockedAt = performance.now();
     checkedSinceLock = 0;
   }
@@ -134,7 +173,7 @@ export function createInput(o) {
   for (const [target, type, fn, opts] of [
     [globalThis, 'keydown', keyDown], [globalThis, 'keyup', keyUp], [globalThis, 'blur', () => clear()],
     [document, 'visibilitychange', () => { if (document.hidden) clear(); }],
-    [document, 'pointerlockerror', () => { refused = true; }],
+    [document, 'pointerlockerror', () => { if (pendingLock?.legacy) lockFailed(pendingLock); }],
     [canvas, 'contextmenu', (e) => { e.preventDefault(); }], [canvas, 'mousedown', buttonDown], [globalThis, 'mouseup', buttonUp],
     [document, 'pointerlockchange', lockChanged], [globalThis, 'mousemove', moved],
     [canvas, 'wheel', wheeled, { passive: false }],
@@ -158,7 +197,7 @@ export function createInput(o) {
     },
     get locked() { return lockedHere(); },
     get lockRefused() { return refused; },
-    releaseLock() { try { if (lockedHere()) document.exitPointerLock(); } catch { /* not locked after all */ } },
+    releaseLock,
     tryLock,
   };
 }
