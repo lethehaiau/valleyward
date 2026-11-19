@@ -367,9 +367,10 @@ function showUpgrade(ev) {
 
   function picked(id, event) {
     if (!offer || sim.state.cards !== offer || !sim.pickCard(id)) return;
+    input.enabled = ready && !isPaused() && !uiApi.modal;
     if (!event?.isTrusted) return;
     focusCanvas();
-    if (restoreLock && !isPaused() && !uiApi.modal && !botOn && !override && rig.view === 'play') input.tryLock();
+    if (restoreLock && input.enabled && !botOn && !override && rig.view === 'play') input.tryLock();
   }
   // A failed UI call switches the facade to the fallback HUD for the same offer.
   const choice = uiApi.cards(ev.cards, picked) ?? uiApi.cards(ev.cards, picked);
