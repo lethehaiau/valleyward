@@ -1,0 +1,14 @@
+[
+ {
+  "id": "banner",
+  "prompt": "A single game sprite texture for a retro first-person pixel-art game: ONE torn, ragged war banner cloth, hanging straight down, seen flat and straight on (orthographic, no perspective, no pole, no rope, no background scene). The cloth is a dirty, faded bone-white canvas with frayed bottom edge cut into two swallow-tail points, a few holes and scorch marks. Painted in the middle of the cloth: a simple dark charcoal emblem of an old iron LAMP (a lantern / fire basket with a small flame shape above it), and the lamp is CROSSED OUT by one thick diagonal slash of dark dried-blood crimson paint from top-left to bottom-right, like a 'no lamp' warning sign daubed by a peasant folk. Crude, hand-painted, folk-art look. Chunky PIXEL ART: about 32 pixels wide by 48 pixels tall, every pixel a crisp hard-edged square block, no anti-aliasing, no blur, limited palette of 7–9 colours (bone #b9b29a, shadow #8a8470, dirt #6b6552, charcoal #26282b, crimson slash #6e1a1a, scorch #3a3028). Even flat lighting, no shading gradient, no text, no letters. The banner shape sits on a perfectly flat, uniform pure MAGENTA #ff00ff background that fills everything around the cloth (so it can be keyed out); the cloth itself contains no magenta.",
+  "out": "assets-src/env/raw/banner.png",
+  "aspect": "2:3"
+ },
+ {
+  "id": "cloth",
+  "prompt": "A single square game texture tile for a retro first-person game: weathered, patched canvas awning cloth of a poor travelling smith's stall, broad vertical stripes alternating dusty slate-blue and faded grey-olive, with a couple of darker stitched patches, soot stains and a frayed seam. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–8 colours (slate blue #4a5a68, #3d4b57, grey-olive #5d6250, #4b5042, soot #2a2d2e, stitching #7b7f74). Even flat lighting with no light gradient, no vignette, no text. The texture fills the whole canvas edge to edge.",
+  "out": "assets-src/env/raw/cloth.png",
+  "aspect": "1:1"
+ }
+]

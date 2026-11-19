@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valleyward · HUD and cinema bench</title>
+  <link rel="icon" href="data:," />
+  <style>
+    html,body{margin:0;height:100%;background:#0b1c24;overflow:hidden;font:12px/1.3 ui-monospace,monospace;color:#cfe}
+    #world{position:fixed;inset:0}#ui{position:fixed;inset:0;pointer-events:none}
+    #bench{position:fixed;right:6px;top:120px;width:250px;max-height:calc(100% - 240px);overflow:auto;background:rgba(5,12,16,.82);border:1px solid #2c4552;padding:6px;z-index:99;display:flex;flex-wrap:wrap;gap:3px}
+    #bench h4{width:100%;margin:6px 0 2px;color:#9ee1e9;font-weight:600}
+    #bench button{font:inherit;font-size:11px;background:#16262f;color:#cfe;border:1px solid #2c4552;padding:2px 5px;cursor:pointer}
+    #bench button:hover{background:#24404e}
+    #bench.hide{display:none}
+    #stat{position:fixed;left:6px;bottom:60px;color:#7fa;z-index:99;font-size:11px;pointer-events:none}
+  </style>
+</head>
+<body>
+  <div id="world"></div>
+  <div id="ui"></div>
+  <div id="bench"></div>
+  <div id="stat"></div>
+  <script type="module" src="./pres.js"></script>
+</body>
+</html>

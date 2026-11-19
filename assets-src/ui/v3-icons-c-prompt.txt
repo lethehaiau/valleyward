@@ -1,0 +1,8 @@
+A single square image: a sprite sheet of 16 retro pixel-art game icons arranged in an exact 4 x 4 grid of equal square cells.
+Background: one flat solid pure magenta colour (#FF00FF) everywhere behind and between the icons. No grid lines, no borders, no frames, no text, no letters, no numbers, no labels, no shadows on the background.
+Style: chunky 16-bit pixel art, each icon about 32 x 32 big pixels scaled up crisply (hard square pixels, no anti-aliasing, no blur), a 1-pixel dark outline (#14181c) around every icon, limited palette: cool slate greys, teal, bone, iron, brass, old gold, dark wood, and fire colours only where there is fire. Each icon is centred in its cell with a clear magenta margin around it. Readable at small size. Original designs, medieval-fantasy night-watch theme.
+Cells, left to right, top to bottom:
+Row 1: (1) a small green goblin silhouette bursting apart into a round orange fireball with flying sparks; (2) a brass six-barrel rotary gun with a wooden stock and a side hand crank, seen from the side; (3) a gold coin resting on a dark iron anvil, glowing softly; (4) a small goblin strapped under a stitched brown bat-wing glider, wings spread.
+Row 2: (5) a round brass ammunition drum; (6) a red-hot glowing gun barrel with heat shimmer lines; (7) a fire basket lamp with an upward arrow; (8) a crescent moon over a small crenellated tower.
+Row 3: (9) a curved iron chain with three links and a hook; (10) a tall black stone needle with three glowing violet rune rings around it; (11) a small red imp holding a chain on a tall iron perch; (12) a pair of brass gears.
+Row 4: (13) a grey ash cloud cone blowing to the right; (14) a single brown bat feather; (15) a gold star badge; (16) a stack of three gold coins with a sparkle.

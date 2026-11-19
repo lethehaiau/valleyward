@@ -1,0 +1,43 @@
+{
+ "tool": "PRES lane",
+ "date": "2026-11-13",
+ "files": {
+  "card-icons.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0) + sharp slicing (assets-src/ui/make-icons.mjs)",
+   "prompt": "A single square image: a sprite sheet of 16 retro pixel-art game icons in a 4 x 4 grid on flat magenta (#FF00FF): pistol + arrow, pistol + speed lines, blunderbuss, pellet spray, flamethrower nozzle, brass fuel tank, firebomb with fuse, firebomb ring of flame, goblin head dropping embers, pitch drop, wildfire, magnet with cyan sparkles, heart with plus, stone wall with trowel, wind swirl, sunburst star (full brief: assets-src/ui/icons-prompt.txt)",
+   "script": "assets-src/ui/make-icons.mjs",
+   "use": "level-up card icons, 4 x 4 atlas of 48 px cells (index order = src/ui/cards.js icon)",
+   "date": "2026-11-13"
+  },
+  "v2-icons-a.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0) + sharp slicing (assets-src/ui/make-icons.mjs)",
+   "prompt": "4 x 4 pixel-art icon sheet on flat magenta: ember fang, coin on a hook, ashen boot, heart bellows, iron cinder amulet, smoked-glass monocle, knotted cord with a flame, spark bead, green-flame wick, black obelisk with a violet crack, imp on a perch with a chain hook, leather hide jerkin, gold coin, goblin skull with a heart, lilac fire footprints, three blue fireballs (brief: assets-src/ui/v2-icons-a-prompt.txt)",
+   "use": "charm, tower and wave-2 card icons (atlas indices 16-31, src/ui/panels.js ICON)",
+   "date": "2026-11-13"
+  },
+  "v2-icons-b.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0) + sharp slicing",
+   "prompt": "4 x 4 pixel-art icon sheet on flat magenta: heart with a flame, bellows gust, green meteor, bandaged heart with an ember, gold heap, fire-basket lamp, padlock, blood moon, hammer and anvil, gold arrow, chain hook, crossed-lamp banner, water bucket, green hex orb, teal rune circle, hooded head with ember eyes (brief: assets-src/ui/v2-icons-b-prompt.txt)",
+   "use": "wave-2 card icons and UI glyphs (atlas indices 32-47)",
+   "date": "2026-11-13"
+  },
+  "cinder-portrait.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0) + sharp keying (make-icons.mjs, 1 cell of 96 px)",
+   "prompt": "pixel-art dialogue portrait of Brother Cinder: a small hunched hooded figure, darkness and two ember eyes in the hood, a cord with a tiny lamp charm, a bony hand on a stick, on flat magenta (brief: assets-src/ui/cinder-portrait-prompt.txt)",
+   "use": "Brother Cinder's panel",
+   "date": "2026-11-13"
+  },
+  "v3-icons-c.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0) + sharp slicing (assets-src/ui/make-icons.mjs)",
+   "prompt": "4 x 4 pixel-art icon sheet on flat magenta: a goblin bursting into a fireball, a brass six-barrel rotary gun with a crank, a gold coin on an anvil, a goblin under a bat-wing glider, a brass drum, a red-hot barrel, a lamp with an arrow, a moon over a tower, a chain hook, an obelisk with violet rune rings, an imp on a perch, two gears, an ash cloud, a feather, a gold star, a coin stack (brief: assets-src/ui/v3-icons-c-prompt.txt)",
+   "use": "Pyre Burst card, the THUNDER ORGAN, Brother Cinder's marker, the pan marker, the slot swap (atlas indices 48-63, src/ui/panels.js ICON)",
+   "date": "2026-11-13"
+  },
+  "v5-icons-d.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0) + sharp slicing (assets-src/ui/make-icons.mjs)",
+   "prompt": "4 x 4 pixel-art icon sheet on flat magenta: a hot gust with embers, an iron-plated forearm, a kindling bundle catching fire, a winged boot, a heart in flame, lilac burning footprints, + 10 spares (brief: assets-src/ui/v5-icons-d-prompt.txt)",
+   "use": "DESIGN §16 cards: Ember Gale 64, Iron Skin 65, Kindling 66, Fleet Foot 67, Hearthblood 68, Cinder Steps 69",
+   "date": "2026-11-14"
+  }
+ }
+}

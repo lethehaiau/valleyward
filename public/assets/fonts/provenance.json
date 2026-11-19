@@ -1,0 +1,11 @@
+{
+ "tool": "Google Fonts download (fonts.gstatic.com, latin subset woff2), self-hosted",
+ "date": "2026-11-13",
+ "files": {
+  "silkscreen-400-latin.woff2": { "tool": "Google Fonts: Silkscreen 400 (latin subset)", "url": "https://fonts.google.com/specimen/Silkscreen", "licence": "SIL OFL 1.1 (OFL-silkscreen.txt)", "use": "HUD numbers, labels, banners, card titles", "date": "2026-11-13" },
+  "silkscreen-700-latin.woff2": { "tool": "Google Fonts: Silkscreen 700 (latin subset)", "url": "https://fonts.google.com/specimen/Silkscreen", "licence": "SIL OFL 1.1 (OFL-silkscreen.txt)", "use": "banners, LEVEL UP!, end-card titles", "date": "2026-11-13" },
+  "pixelify-sans-latin.woff2": { "tool": "Google Fonts: Pixelify Sans variable 400–700 (latin subset)", "url": "https://fonts.google.com/specimen/Pixelify+Sans", "licence": "SIL OFL 1.1 (OFL-pixelifysans.txt)", "use": "body text: card descriptions, controls, subtitles", "date": "2026-11-13" },
+  "OFL-silkscreen.txt": { "tool": "licence text", "url": "https://github.com/google/fonts/blob/main/ofl/silkscreen/OFL.txt", "date": "2026-11-13" },
+  "OFL-pixelifysans.txt": { "tool": "licence text", "url": "https://github.com/google/fonts/blob/main/ofl/pixelifysans/OFL.txt", "date": "2026-11-13" }
+ }
+}

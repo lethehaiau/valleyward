@@ -1,0 +1,8 @@
+A single square image: a sprite sheet of 16 retro pixel-art game icons arranged in an exact 4 x 4 grid of equal square cells.
+Background: one flat solid pure magenta colour (#FF00FF) everywhere behind and between the icons. No grid lines, no borders, no frames, no text, no letters, no numbers, no labels, no shadows on the background.
+Style: chunky 16-bit pixel art, each icon about 32 x 32 big pixels scaled up crisply (hard square pixels, no anti-aliasing, no blur), a 1-pixel dark outline (#14181c) around every icon, limited palette: cool slate greys, teal, cyan-white, pale bone, iron, dark wood, old gold, and fire colours only where there is fire. Each icon is centred in its cell with a clear magenta margin around it. Readable at small size. Original designs, medieval-fantasy night-watch theme.
+Cells, left to right, top to bottom:
+Row 1: (1) a red heart with a small orange flame burning inside it; (2) a wooden blacksmith bellows puffing a gust of air with two sparks; (3) a green burning meteor rock falling diagonally with a green fire tail; (4) a red heart wrapped in a bandage with a small ember glowing on it.
+Row 2: (5) a small heap of gold coins; (6) an iron fire basket lamp on a short pole with a tall orange flame; (7) a closed iron padlock; (8) a round full moon tinted blood red.
+Row 3: (9) a blacksmith hammer over a small anvil; (10) an upward pointing chunky gold arrow; (11) an iron chain ending in a hook; (12) a tattered cloth banner showing a lamp crossed out with a red X.
+Row 4: (13) a wooden bucket splashing blue water; (14) a small green glowing orb with a swirl inside; (15) a round glowing rune circle on the ground, teal; (16) a small hooded figure's head with two glowing ember eyes in the dark hood.

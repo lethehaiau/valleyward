@@ -1,0 +1,8 @@
+A single square image: a sprite sheet of 16 retro pixel-art game icons arranged in an exact 4 x 4 grid of equal square cells.
+Background: one flat solid pure magenta colour (#FF00FF) everywhere behind and between the icons. No grid lines, no borders, no frames, no text, no letters, no numbers, no labels, no shadows on the background.
+Style: chunky 16-bit pixel art, each icon about 32 x 32 big pixels scaled up crisply (hard square pixels, no anti-aliasing, no blur), a 1-pixel dark outline (#14181c) around every icon, limited palette: cool slate greys, teal, cyan-white, pale bone, iron, dark wood, and warm fire colours (white-yellow, orange, crimson) only where there is fire. Each icon is centred in its cell with a clear magenta margin around it. Readable at small size. Original designs, medieval-fantasy night-watch theme.
+Cells, left to right, top to bottom:
+Row 1: (1) a flintlock pistol with a small upward arrow chevron; (2) a flintlock pistol with three motion speed lines; (3) a short bell-mouthed blunderbuss gun; (4) a spray of many small round lead pellets fanning out.
+Row 2: (5) a brass flamethrower nozzle with a long thin flame stream; (6) a round brass fuel tank with a rivet band; (7) a round black clay firebomb flask with a lit fuse; (8) a firebomb bursting into a wide ring of flame.
+Row 3: (9) a small goblin head silhouette dropping glowing embers; (10) a dripping drop of black pitch oil; (11) a wild spreading flame with curls; (12) a horseshoe magnet with cyan sparkles.
+Row 4: (13) a red heart with a small plus sign; (14) a stone brick wall with a trowel; (15) a curved wind gust swirl in pale cyan; (16) a radiant sun-burst star with rays.

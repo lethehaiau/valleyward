@@ -1,0 +1,39 @@
+# Dependencies, builds and scratch
+node_modules/
+dist/
+.scratch/
+assets-src/tmp/
+.DS_Store
+*.log
+
+# Secrets: never commit an env file
+.env
+.env.*
+
+# Raw source binaries stay local
+assets-src/**/*.glb
+assets-src/**/*.gltf
+assets-src/**/*.bin
+assets-src/**/*.fbx
+assets-src/**/*.obj
+assets-src/**/*.png
+assets-src/**/*.jpg
+assets-src/**/*.jpeg
+assets-src/**/*.webp
+assets-src/**/*.wav
+assets-src/**/*.mp3
+assets-src/**/*.ogg
+assets-src/**/*.flac
+assets-src/**/*.mp4
+assets-src/**/*.zip
+.claude/
+
+# Generation logs stay local: raw takes with their receipts and sidecars, the API call ledger
+assets-src/**/raw/
+assets-src/audio/calls.json
+assets-src/ui/*.png.json
+
+# The audio set is not in this repo (ElevenLabs-generated, licensed to the authors): keep it in .private/audio/
+# (tools/vite-audio.mjs adds it to dev servers and builds when present; without it the game is silent)
+.private/
+public/assets/audio/

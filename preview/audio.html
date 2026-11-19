@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VALLEYWARD · audio bench</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root { color-scheme: dark; --bg: #0b1114; --panel: #131c21; --ink: #d9e6ea; --dim: #7f9298; --ember: #ff8a3d; --line: #24323a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 16px; background: var(--bg); color: var(--ink); font: 13px/1.4 ui-monospace, Menlo, monospace; }
+    h1 { font-size: 16px; margin: 0 0 4px; color: var(--ember); letter-spacing: 0.06em; }
+    h2 { font-size: 12px; margin: 14px 0 6px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; }
+    button { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; font: inherit; cursor: pointer; }
+    button:hover { border-color: var(--ember); }
+    button.on { background: #3a2210; border-color: var(--ember); }
+    button small { color: var(--dim); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 14px; }
+    label { display: flex; align-items: center; gap: 8px; }
+    label span { width: 92px; color: var(--dim); }
+    input[type=range] { flex: 1; }
+    #gate { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(5, 8, 10, 0.92); font-size: 15px; cursor: pointer; z-index: 2; }
+    #stats { white-space: pre-wrap; background: var(--panel); border: 1px solid var(--line); padding: 8px; border-radius: 4px; max-height: 260px; overflow: auto; }
+    #meter { height: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+    #meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #3a7d5a, #e0b040 70%, #e04030); }
+  </style>
+</head>
+<body>
+  <div id="gate">Click to start the audio bench (the first gesture resumes the AudioContext)</div>
+  <h1>VALLEYWARD · audio bench</h1>
+  <div style="color:var(--dim)">The audio code · src/audio/index.js · assets/audio/manifest.json. Click a sound to play a random variant. Output meter = the limiter's output.</div>
+  <h2>Output</h2>
+  <div id="meter"><i></i></div>
+  <div id="meterText" style="color:var(--dim)"></div>
+  <h2>Music</h2>
+  <div class="row" id="music"></div>
+  <h2>Beds (manual)</h2>
+  <div class="row"><button id="manual" class="on">beds: manual (sliders)</button><button id="auto">beds: simulated state</button></div>
+  <div class="grid" id="beds" style="margin-top:6px"></div>
+  <h2>Stress</h2>
+  <div class="row" id="stress"></div>
+  <h2>Events (through onEvent, rate-limited like the game)</h2>
+  <div class="row" id="events"></div>
+  <h2>The camp, towers, skills, elites, Dousers, charms (through onEvent)</h2>
+  <div class="row" id="events2"></div>
+  <h2>The later nights (layers), rain, the Siege Ram, the coven, the Rainmother, the ending (simulated state)</h2>
+  <div class="row" id="events4"></div>
+  <h2>THUNDER ORGAN, Bat Gremlins, Pyre Burst, Ash Roar, BEGIN NIGHT</h2>
+  <div class="row" id="events3"></div>
+  <h2>Brother Cinder (audio.say(line); the subtitle text is VOICE_LINES in src/audio/bank.js)</h2>
+  <div class="row" id="cinder"></div>
+  <div id="subtitle" style="margin-top:6px;color:var(--ember);min-height:1.4em"></div>
+  <h2>Sounds (direct)</h2>
+  <div id="sounds"></div>
+  <h2>Stats</h2>
+  <div id="stats"></div>
+  <script type="module" src="./audio.js"></script>
+</body>
+</html>

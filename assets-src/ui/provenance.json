@@ -1,0 +1,71 @@
+{
+ "tool": "PRES lane",
+ "date": "2026-11-13",
+ "files": {
+  "card-icons-sheet.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0)",
+   "prompt": "A single square image: a sprite sheet of 16 retro pixel-art game icons in a 4 x 4 grid on flat magenta (#FF00FF): pistol + arrow, pistol + speed lines, blunderbuss, pellet spray, flamethrower nozzle, brass fuel tank, firebomb with fuse, firebomb ring of flame, goblin head dropping embers, pitch drop, wildfire, magnet with cyan sparkles, heart with plus, stone wall with trowel, wind swirl, sunburst star (full brief: assets-src/ui/icons-prompt.txt)",
+   "date": "2026-11-13"
+  },
+  "icons-prompt.txt": {
+   "tool": "hand-written brief",
+   "prompt": "the brief itself",
+   "date": "2026-11-13"
+  },
+  "make-icons.mjs": {
+   "tool": "hand-written script",
+   "script": "assets-src/ui/make-icons.mjs",
+   "date": "2026-11-13"
+  },
+  "v2-icons-a-sheet.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0)",
+   "prompt": "see v2-icons-a-prompt.txt (the full prompt)",
+   "date": "2026-11-13"
+  },
+  "v2-icons-a-prompt.txt": {
+   "tool": "hand-written brief",
+   "prompt": "the brief itself",
+   "date": "2026-11-13"
+  },
+  "v2-icons-b-sheet.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0)",
+   "prompt": "see v2-icons-b-prompt.txt (the full prompt)",
+   "date": "2026-11-13"
+  },
+  "v2-icons-b-prompt.txt": {
+   "tool": "hand-written brief",
+   "prompt": "the brief itself",
+   "date": "2026-11-13"
+  },
+  "cinder-portrait-sheet.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0)",
+   "prompt": "see cinder-portrait-prompt.txt (the full prompt)",
+   "date": "2026-11-13"
+  },
+  "cinder-portrait-prompt.txt": {
+   "tool": "hand-written brief",
+   "prompt": "the brief itself",
+   "date": "2026-11-13"
+  },
+  "v3-icons-c-sheet.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0)",
+   "prompt": "see v3-icons-c-prompt.txt (the full prompt)",
+   "date": "2026-11-13"
+  },
+  "v3-icons-c-prompt.txt": {
+   "tool": "hand-written brief",
+   "prompt": "the brief itself",
+   "date": "2026-11-13"
+  },
+  "v5-icons-d-sheet.png": {
+   "tool": "codex-image (GPT Image 2.5 via Codex CLI, $0)",
+   "prompt": "see v5-icons-d-prompt.txt; sidecar v5-icons-d-sheet.png.json",
+   "date": "2026-11-14"
+  },
+  "v5-icons-d-prompt.txt": {
+   "tool": "hand-written brief",
+   "prompt": "the brief itself",
+   "date": "2026-11-14"
+  }
+ }
+}

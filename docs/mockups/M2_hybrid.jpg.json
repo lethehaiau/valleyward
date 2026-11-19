@@ -1,0 +1,25 @@
+{
+ "tool": "codex exec (Codex CLI built-in image generation)",
+ "wrapper": "tools/codex-image.mjs",
+ "date": "2026-11-18T02:17:28.478Z",
+ "id": "m2_hybrid",
+ "out": "docs/mockups/M2_hybrid.png",
+ "prompt": "TEXT-ONLY BRIEF (no reference images are attached). Everything in the frame is original to VALLEYWARD.\n\nA finished IN-GAME SCREENSHOT of a real-time browser first-person shooter called VALLEYWARD, 16:9, 1920x1080. This is NOT concept art, NOT a painting, NOT a poster: it is a gameplay frame with the HUD on screen, and it must look achievable in a real-time WebGL browser game.\n\nSTYLE (a modern retro first-person horde shooter): first person. The world is chunky blocky 3D: big cube-cut stone blocks, wooden palisade posts, low-poly pine trees; every surface uses LOW-RESOLUTION PIXEL-ART TEXTURES with nearest-neighbour (blocky, unfiltered) texels, like a modern retro shooter: the texels read as small crisp squares on every wall, road, roof and tree (about 16 to 32 texels per metre), with colour variation from block to block and darker joints between the stones. ENEMIES are flat 2D PIXEL-ART SPRITES standing in the 3D world, always facing the camera, about 32x32-pixel sprites drawn big and chunky: small goblins and imps with big heads, pointy ears, ragged tunics, crude spears and torches. Thousands of them. Modern lighting over the retro world: soft volumetric moonlight shafts, fog layers in the valley, bloom, a filmic colour grade, soft vignette.\n\nTHE NIGHT: a cold night. Deep teal-indigo sky, a HUGE pale cyan-white full moon low over a misty pine valley, distant blue mountains. Everything that is not fire is cool (teal, indigo, slate blue, grey-green).\n\nTHE FIRE (the look of a high-resolution GPU fluid simulation seen up close): fire is a REAL-TIME FLUID SIMULATION spreading over the ground, not particles and not cartoon flame sprites. It curls and swirls into marbled eddies like molten liquid, with a white-yellow core, bright orange body, deep crimson edges, and thick billowing charcoal-brown smoke lit orange from below; thin glowing filaments fold into curls and vortex eddies like glowing ink swirling in water. Fire is the ONLY warm light in the scene: it throws strong orange light onto the nearby stone walls, the ground and the goblin sprites. Burning goblins turn orange-red and run.\n\nCOLOUR RULES: warm colours (white-yellow, orange, crimson) belong ONLY to fire, embers and the player's weapon pilot flame. The night, the stone, the forest and the goblins stay cool and muted (olive, ochre-grey, grey-green) unless lit by fire.\n\nHUD (crisp chunky PIXEL FONT, white with a dark outline, small, at the screen edges only): top-centre \"NIGHT I  03:12\" above a thin wave bar; top-left a thin gold XP bar with \"LV 4\"; bottom-left a red health bar with \"84\"; bottom-right \"EMBER LANCE\" over a small orange fuel gauge. No other text anywhere. No logos, no watermark.\n\nTHE PLAYER'S WEAPON (bottom-right of frame, first-person view model): two leather-gloved hands holding the EMBER LANCE, a chunky low-poly flamethrower made of a dented brass fuel tank, iron pipes and a flared iron nozzle with a tiny blue-orange pilot flame; pixel-art textures on it too.\n\nMOMENT M2 \"THE GATE\": seen from the top of the fort's stone wall walk (camera 5 m above the ground, looking down and outward over the battlement), the horde has piled into a great MOUND of pixel goblins climbing over each other against the fort's wooden gate below, like a wave of sprites. A long stone trough of OIL along the foot of the wall has just been ignited: a wall of fluid fire runs along it and curls up the mound in swirling marbled eddies, setting hundreds of goblins alight, with thick smoke rolling up past the battlement and glowing embers drifting. Behind the camera's right shoulder (upper right of frame) the fort's tall BEACON TOWER blazes: an iron fire basket on a stone tower pouring orange light and smoke into the sky. The giant cyan-white moon hangs over the pine valley, thousands more goblins stream up the road from the fog. The player's gloved hands hold the EMBER LANCE at the bottom right, its pilot flame lit.\n\nFIRE RENDERING STYLE: HYBRID PIXEL FLUID. The fire and smoke keep the same curling, swirling fluid SHAPES, but they are rendered on a coarse pixel grid (each fire pixel about 4 screen pixels wide), with a STEPPED colour ramp of about 6 flat colours (white-yellow, yellow, orange, red-orange, crimson, dark maroon) and ordered dithering where the colours meet and at the smoke edges, so the fire matches the pixel-art world and sprites while still moving like a fluid. The glow and light the fire throws on the world stay smooth.\n",
+ "promptFile": null,
+ "refs": [],
+ "aspect": "16:9",
+ "secs": 139,
+ "attempts": 1,
+ "generated": {
+  "width": 1672,
+  "height": 941,
+  "format": "png"
+ },
+ "crop": null,
+ "size": {
+  "width": 1672,
+  "height": 941
+ },
+ "model": "codex default",
+ "postprocess": "converted to JPEG (sharp mozjpeg q90, 4:4:4) as docs/mockups/M2_hybrid.jpg; the PNG was not kept"
+}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valleyward · fluid bench</title>
+  <link rel="icon" href="data:," />
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b1c24; overflow: hidden; font: 12px/1.35 ui-monospace, Menlo, monospace; color: #cfe9ee; }
+    canvas#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    #hud { position: fixed; left: 8px; top: 8px; background: rgba(6, 16, 20, 0.72); padding: 8px 10px; border-radius: 4px; max-width: 360px; white-space: pre; pointer-events: none; }
+    #ctl { position: fixed; right: 8px; top: 8px; background: rgba(6, 16, 20, 0.72); padding: 8px 10px; border-radius: 4px; }
+    #ctl label { display: block; margin: 2px 0; }
+    #grid { position: fixed; right: 8px; bottom: 8px; width: 384px; height: 384px; image-rendering: pixelated; border: 1px solid #335; display: none; }
+    body.noui #hud, body.noui #ctl, body.noui #grid { display: none !important; }
+  </style>
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <div id="hud">loading…</div>
+  <div id="ctl">
+    <label>wind <input id="wind" type="range" min="0" max="6" step="0.1" value="1.2" /> <span id="windv">1.2</span> m/s</label>
+    <label>dir&nbsp; <input id="wdir" type="range" min="0" max="360" step="5" value="200" /> <span id="wdirv">200</span>°</label>
+    <div>hold mouse: Lance · B bomb · T troughs · E burning goblins<br>D douse all · U douse (bucket) at cursor · S style · 1/2/3 quality · C camera (m1, m2, m2b, top)<br>F fluid on/off · G read-back grid · P pause<br>hues at the cursor: V violet nova · O blue orbit · M green meteor · L lilac trail · W green (Witchfire) Lance<br>weather: R rain 0/0.5/1 · K tide wave · Y whirlpool (at the cursor) · X the pillar · Z the demon fire (C: end, demon views)</div>
+  </div>
+  <canvas id="grid" width="64" height="64"></canvas>
+  <script type="module" src="./fluid.js"></script>
+</body>
+</html>

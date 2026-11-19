@@ -1,0 +1,72 @@
+[
+ {
+  "id": "stone",
+  "prompt": "A single square game texture tile for a retro first-person game: the face of ONE large weathered cut stone block (no mortar joints, the block fills the tile): cool slate grey-blue granite with darker speckles, a few small chips and faint hairline cracks, a little grey-green lichen. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (slate #3a4652, #4a5560, #59646d, #2e3740, grey-green #4d5a4a, pale #6d7880), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/stone.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "blocks",
+  "prompt": "A single square game texture tile for a retro first-person game: a castle wall of cube-cut stone blocks in staggered courses, 4 courses of blocks across the tile, each block a slightly different grey-blue tone, dark thin joints between blocks. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (slate #3a4652, #4a5560, #5b6670, #2a323a joints, #66717a highlights), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/blocks.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "flag",
+  "prompt": "A single square game texture tile for a retro first-person game: worn stone paving flagstones of a castle wall walk seen from above, irregular rectangular slabs with dark joints, scuffed. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (grey-blue #3d4853, #4c5762, #5c6670, joints #262d34), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/flag.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "timber",
+  "prompt": "A single square game texture tile for a retro first-person game: vertical rough oak planks of a fort gate, 4 planks across the tile with dark gaps, wood grain lines and a couple of knots. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (dark brown #3a2a21, #4b3626, #5e4430, #2a1d16 gaps, #6d513a highlights), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/timber.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "earth",
+  "prompt": "A single square game texture tile for a retro first-person game: packed bare earth ground seen from above, small stones and darker clods. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (brown-grey #3b3a34, #47443c, #55503f, #2f2d28, #615a48), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/earth.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "road",
+  "prompt": "A single square game texture tile for a retro first-person game: a trodden dirt road surface seen from above, compacted earth with many small pebbles and wheel-worn patches. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (earth #4a3f33, #574a3a, #3d342b, pebbles #6a6152, #2f2822), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/road.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "grass",
+  "prompt": "A single square game texture tile for a retro first-person game: short dark night meadow grass seen from above, mixed tufts and a few dirt specks. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (teal-green #2b4a3a, #355743, #22392f, #41664c, dirt #3b3a34), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/grass.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "roof",
+  "prompt": "A single square game texture tile for a retro first-person game: a roof of overlapping slate shingles in rows, seen straight on, 6 rows across the tile, each row overlapping the one below and offset by half a shingle from it (staggered like a real slate roof), the shingles with slightly rounded, uneven lower edges. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (blue-grey slate #2f3a44, #3b4752, #48545e, #232b33 shadows), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/roof.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "iron",
+  "prompt": "A single square game texture tile for a retro first-person game: a dark riveted iron plate with a few rivets, scratches and rust spots. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (iron #2c2b2e, #3a393c, #4a4848, rust #5a3a2a, #1d1c1f), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/iron.png",
+  "aspect": "1:1",
+  "refs": []
+ },
+ {
+  "id": "pine",
+  "prompt": "A single square game texture tile for a retro first-person game: dense dark pine needle foliage seen up close, layered needle clumps, the clumps in the lighter greens clearly readable against the darker gaps between them. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–9 colours (dark pine green #1f3a33, #27473c, #30574a, #18302a, #3a6656), even flat lighting with no light gradient, no vignette, no shadow falling across the tile, no text. The texture fills the whole canvas edge to edge. The look in words (no reference image is attached): the low-res, nearest-filtered pixel textures on the stone walls, the road and the timber of a retro pixel-textured 3D first-person game set at a hilltop keep on a cold moonlit night; make ONLY the flat texture swatch, never a scene.",
+  "out": "assets-src/env/raw/pine.png",
+  "aspect": "1:1",
+  "refs": []
+ }
+]

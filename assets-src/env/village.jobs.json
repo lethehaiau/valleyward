@@ -1,0 +1,14 @@
+[
+ {
+  "id": "thatch",
+  "prompt": "A single square game texture tile for a retro first-person game: a thick straw THATCH roof of a small round village hut seen straight on: dense rows of dry reed and straw bundles, layered in overlapping horizontal courses, slightly ragged, weathered grey-ochre straw with darker damp shadows between the courses and a few moss tufts. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–8 muted colours (straw #8a7d5a, #6f6448, #a39572, shadow #3e3829, moss #4f5a3c, grey #77705f). Even flat lighting with no light gradient, no vignette, no text. The texture fills the whole canvas edge to edge.",
+  "out": "assets-src/env/raw/thatch.png",
+  "aspect": "1:1"
+ },
+ {
+  "id": "mud",
+  "prompt": "A single square game texture tile for a retro first-person game: the wattle-and-daub wall of a small round village hut: dried mud and clay plaster over woven sticks, a few cracks where the woven wattle shows through, darker lower edge splashed with dirt. Flat, seamless and tileable on all four edges, seen straight on (orthographic, no perspective, no horizon, no object outline, no border, no frame). Chunky PIXEL ART: about 32×32 crisp square pixels across the whole image, every pixel a hard-edged block, no anti-aliasing, no blur, limited palette of 6–8 muted earthy colours (clay #6e604c, #5a4f40, #807158, wattle #4a3b2c, crack #2f2820, pale #8c8068). Even flat lighting with no light gradient, no vignette, no text. The texture fills the whole canvas edge to edge.",
+  "out": "assets-src/env/raw/mud.png",
+  "aspect": "1:1"
+ }
+]

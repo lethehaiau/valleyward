@@ -1,0 +1,103 @@
+{
+ "tool": "Codex GPT Image texture swatch sheet (tools/codex-image.mjs, $0) → assets-src/sprites/pipeline/build.mjs (crop + 64×64)",
+ "date": "2026-11-18",
+ "files": {
+  "viewmodel/leather.png": {
+   "tool": "codex-image swatch + pipeline",
+   "script": "assets-src/sprites/pipeline/build.mjs",
+   "date": "2026-11-18",
+   "generations": [
+    {
+     "id": "vmtex",
+     "tool": "codex exec (Codex CLI built-in image generation)",
+     "prompt": "TEXT-ONLY BRIEF (no reference images are attached): the look is the chunky pixel-texture look of the first-person weapon and the gloved hands of a modern retro first-person horde shooter set on a cold moonlit night (a dented brass fuel tank, blackened iron pipes, worn leather gloves): every material shaded with a few flat tones in crisp square pixel blocks, small clusters of darker pixels as wear, muted colours.\n\nA TEXTURE SWATCH SHEET for a retro first-person game: exactly 6 square pixel-art material swatches arranged in 2 rows of 3 on a flat, perfectly uniform, solid pure magenta #FF00FF background, with wide magenta gaps between the swatches. Each swatch is a completely filled square of 64 x 64 art pixels (every art pixel a crisp square block, hard edges, no anti-aliasing, no blur), flat and evenly lit (no perspective, no outline, no border, no text), seamless so it can tile:\nRow 1: (1) worn dark-brown glove LEATHER with creases, scuffs and a stitched seam; (2) dented polished BRASS, warm yellow-brown with darker patina blotches, small dents and a riveted seam; (3) blackened IRON, cool dark grey with rivets, scratches and rust specks.\nRow 2: (4) OAK WOOD grain, mid-brown planks with grain lines and a knot; (5) rough dark grey-green wool CLOTH for a sleeve, a coarse weave; (6) a scuffed red-brown leather STRAP texture with a stitched edge and a small iron buckle hole.",
+     "refs": [],
+     "date": "2026-11-18T09:42:00.182Z",
+     "raw": "assets-src/sprites/raw/vmtex.png"
+    }
+   ],
+   "postprocess": "cropped from the swatch sheet, 64×64, then re-toned to a muted mean colour by VM_GRADE in assets-src/sprites/pipeline/build.mjs (since 2026-11-13; --vm-only re-grades without re-packing the atlas)"
+  },
+  "viewmodel/brass.png": {
+   "tool": "codex-image swatch + pipeline",
+   "script": "assets-src/sprites/pipeline/build.mjs",
+   "date": "2026-11-18",
+   "generations": [
+    {
+     "id": "vmtex",
+     "tool": "codex exec (Codex CLI built-in image generation)",
+     "prompt": "TEXT-ONLY BRIEF (no reference images are attached): the look is the chunky pixel-texture look of the first-person weapon and the gloved hands of a modern retro first-person horde shooter set on a cold moonlit night (a dented brass fuel tank, blackened iron pipes, worn leather gloves): every material shaded with a few flat tones in crisp square pixel blocks, small clusters of darker pixels as wear, muted colours.\n\nA TEXTURE SWATCH SHEET for a retro first-person game: exactly 6 square pixel-art material swatches arranged in 2 rows of 3 on a flat, perfectly uniform, solid pure magenta #FF00FF background, with wide magenta gaps between the swatches. Each swatch is a completely filled square of 64 x 64 art pixels (every art pixel a crisp square block, hard edges, no anti-aliasing, no blur), flat and evenly lit (no perspective, no outline, no border, no text), seamless so it can tile:\nRow 1: (1) worn dark-brown glove LEATHER with creases, scuffs and a stitched seam; (2) dented polished BRASS, warm yellow-brown with darker patina blotches, small dents and a riveted seam; (3) blackened IRON, cool dark grey with rivets, scratches and rust specks.\nRow 2: (4) OAK WOOD grain, mid-brown planks with grain lines and a knot; (5) rough dark grey-green wool CLOTH for a sleeve, a coarse weave; (6) a scuffed red-brown leather STRAP texture with a stitched edge and a small iron buckle hole.",
+     "refs": [],
+     "date": "2026-11-18T09:42:00.182Z",
+     "raw": "assets-src/sprites/raw/vmtex.png"
+    }
+   ],
+   "postprocess": "cropped from the swatch sheet, 64×64, then re-toned to a muted mean colour by VM_GRADE in assets-src/sprites/pipeline/build.mjs (since 2026-11-13; --vm-only re-grades without re-packing the atlas)"
+  },
+  "viewmodel/iron.png": {
+   "tool": "codex-image swatch + pipeline",
+   "script": "assets-src/sprites/pipeline/build.mjs",
+   "date": "2026-11-18",
+   "generations": [
+    {
+     "id": "vmtex",
+     "tool": "codex exec (Codex CLI built-in image generation)",
+     "prompt": "TEXT-ONLY BRIEF (no reference images are attached): the look is the chunky pixel-texture look of the first-person weapon and the gloved hands of a modern retro first-person horde shooter set on a cold moonlit night (a dented brass fuel tank, blackened iron pipes, worn leather gloves): every material shaded with a few flat tones in crisp square pixel blocks, small clusters of darker pixels as wear, muted colours.\n\nA TEXTURE SWATCH SHEET for a retro first-person game: exactly 6 square pixel-art material swatches arranged in 2 rows of 3 on a flat, perfectly uniform, solid pure magenta #FF00FF background, with wide magenta gaps between the swatches. Each swatch is a completely filled square of 64 x 64 art pixels (every art pixel a crisp square block, hard edges, no anti-aliasing, no blur), flat and evenly lit (no perspective, no outline, no border, no text), seamless so it can tile:\nRow 1: (1) worn dark-brown glove LEATHER with creases, scuffs and a stitched seam; (2) dented polished BRASS, warm yellow-brown with darker patina blotches, small dents and a riveted seam; (3) blackened IRON, cool dark grey with rivets, scratches and rust specks.\nRow 2: (4) OAK WOOD grain, mid-brown planks with grain lines and a knot; (5) rough dark grey-green wool CLOTH for a sleeve, a coarse weave; (6) a scuffed red-brown leather STRAP texture with a stitched edge and a small iron buckle hole.",
+     "refs": [],
+     "date": "2026-11-18T09:42:00.182Z",
+     "raw": "assets-src/sprites/raw/vmtex.png"
+    }
+   ],
+   "postprocess": "cropped from the swatch sheet, 64×64, then re-toned to a muted mean colour by VM_GRADE in assets-src/sprites/pipeline/build.mjs (since 2026-11-13; --vm-only re-grades without re-packing the atlas)"
+  },
+  "viewmodel/wood.png": {
+   "tool": "codex-image swatch + pipeline",
+   "script": "assets-src/sprites/pipeline/build.mjs",
+   "date": "2026-11-18",
+   "generations": [
+    {
+     "id": "vmtex",
+     "tool": "codex exec (Codex CLI built-in image generation)",
+     "prompt": "TEXT-ONLY BRIEF (no reference images are attached): the look is the chunky pixel-texture look of the first-person weapon and the gloved hands of a modern retro first-person horde shooter set on a cold moonlit night (a dented brass fuel tank, blackened iron pipes, worn leather gloves): every material shaded with a few flat tones in crisp square pixel blocks, small clusters of darker pixels as wear, muted colours.\n\nA TEXTURE SWATCH SHEET for a retro first-person game: exactly 6 square pixel-art material swatches arranged in 2 rows of 3 on a flat, perfectly uniform, solid pure magenta #FF00FF background, with wide magenta gaps between the swatches. Each swatch is a completely filled square of 64 x 64 art pixels (every art pixel a crisp square block, hard edges, no anti-aliasing, no blur), flat and evenly lit (no perspective, no outline, no border, no text), seamless so it can tile:\nRow 1: (1) worn dark-brown glove LEATHER with creases, scuffs and a stitched seam; (2) dented polished BRASS, warm yellow-brown with darker patina blotches, small dents and a riveted seam; (3) blackened IRON, cool dark grey with rivets, scratches and rust specks.\nRow 2: (4) OAK WOOD grain, mid-brown planks with grain lines and a knot; (5) rough dark grey-green wool CLOTH for a sleeve, a coarse weave; (6) a scuffed red-brown leather STRAP texture with a stitched edge and a small iron buckle hole.",
+     "refs": [],
+     "date": "2026-11-18T09:42:00.182Z",
+     "raw": "assets-src/sprites/raw/vmtex.png"
+    }
+   ],
+   "postprocess": "cropped from the swatch sheet, 64×64, then re-toned to a muted mean colour by VM_GRADE in assets-src/sprites/pipeline/build.mjs (since 2026-11-13; --vm-only re-grades without re-packing the atlas)"
+  },
+  "viewmodel/cloth.png": {
+   "tool": "codex-image swatch + pipeline",
+   "script": "assets-src/sprites/pipeline/build.mjs",
+   "date": "2026-11-18",
+   "generations": [
+    {
+     "id": "vmtex",
+     "tool": "codex exec (Codex CLI built-in image generation)",
+     "prompt": "TEXT-ONLY BRIEF (no reference images are attached): the look is the chunky pixel-texture look of the first-person weapon and the gloved hands of a modern retro first-person horde shooter set on a cold moonlit night (a dented brass fuel tank, blackened iron pipes, worn leather gloves): every material shaded with a few flat tones in crisp square pixel blocks, small clusters of darker pixels as wear, muted colours.\n\nA TEXTURE SWATCH SHEET for a retro first-person game: exactly 6 square pixel-art material swatches arranged in 2 rows of 3 on a flat, perfectly uniform, solid pure magenta #FF00FF background, with wide magenta gaps between the swatches. Each swatch is a completely filled square of 64 x 64 art pixels (every art pixel a crisp square block, hard edges, no anti-aliasing, no blur), flat and evenly lit (no perspective, no outline, no border, no text), seamless so it can tile:\nRow 1: (1) worn dark-brown glove LEATHER with creases, scuffs and a stitched seam; (2) dented polished BRASS, warm yellow-brown with darker patina blotches, small dents and a riveted seam; (3) blackened IRON, cool dark grey with rivets, scratches and rust specks.\nRow 2: (4) OAK WOOD grain, mid-brown planks with grain lines and a knot; (5) rough dark grey-green wool CLOTH for a sleeve, a coarse weave; (6) a scuffed red-brown leather STRAP texture with a stitched edge and a small iron buckle hole.",
+     "refs": [],
+     "date": "2026-11-18T09:42:00.182Z",
+     "raw": "assets-src/sprites/raw/vmtex.png"
+    }
+   ],
+   "postprocess": "cropped from the swatch sheet, 64×64, then re-toned to a muted mean colour by VM_GRADE in assets-src/sprites/pipeline/build.mjs (since 2026-11-13; --vm-only re-grades without re-packing the atlas)"
+  },
+  "viewmodel/strap.png": {
+   "tool": "codex-image swatch + pipeline",
+   "script": "assets-src/sprites/pipeline/build.mjs",
+   "date": "2026-11-18",
+   "generations": [
+    {
+     "id": "vmtex",
+     "tool": "codex exec (Codex CLI built-in image generation)",
+     "prompt": "TEXT-ONLY BRIEF (no reference images are attached): the look is the chunky pixel-texture look of the first-person weapon and the gloved hands of a modern retro first-person horde shooter set on a cold moonlit night (a dented brass fuel tank, blackened iron pipes, worn leather gloves): every material shaded with a few flat tones in crisp square pixel blocks, small clusters of darker pixels as wear, muted colours.\n\nA TEXTURE SWATCH SHEET for a retro first-person game: exactly 6 square pixel-art material swatches arranged in 2 rows of 3 on a flat, perfectly uniform, solid pure magenta #FF00FF background, with wide magenta gaps between the swatches. Each swatch is a completely filled square of 64 x 64 art pixels (every art pixel a crisp square block, hard edges, no anti-aliasing, no blur), flat and evenly lit (no perspective, no outline, no border, no text), seamless so it can tile:\nRow 1: (1) worn dark-brown glove LEATHER with creases, scuffs and a stitched seam; (2) dented polished BRASS, warm yellow-brown with darker patina blotches, small dents and a riveted seam; (3) blackened IRON, cool dark grey with rivets, scratches and rust specks.\nRow 2: (4) OAK WOOD grain, mid-brown planks with grain lines and a knot; (5) rough dark grey-green wool CLOTH for a sleeve, a coarse weave; (6) a scuffed red-brown leather STRAP texture with a stitched edge and a small iron buckle hole.",
+     "refs": [],
+     "date": "2026-11-18T09:42:00.182Z",
+     "raw": "assets-src/sprites/raw/vmtex.png"
+    }
+   ],
+   "postprocess": "cropped from the swatch sheet, 64×64, then re-toned to a muted mean colour by VM_GRADE in assets-src/sprites/pipeline/build.mjs (since 2026-11-13; --vm-only re-grades without re-packing the atlas)"
+  }
+ },
+ "note": "The viewmodel meshes themselves are built in code (src/actors/viewmodel.js); only these textures are files. The swatch sheet (vmtex) was regenerated on 2026-11-18 from a text-only prompt with no reference image."
+}
