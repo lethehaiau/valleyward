@@ -152,4 +152,4 @@ npm run dev     # http://127.0.0.1:5350/
 [ASSET-LICENSES.md](ASSET-LICENSES.md) lists which files each licence covers. To cite the fire engine, use Firewraith's
 DOI, [10.5281/zenodo.24364837](https://doi.org/10.5281/zenodo.24364837) (v0.2.0).
 
-<p align="center"><sub>Made by <a href="https://github.com/lethehaiau">Au Le</a> · formerly EMBERWATCH (renamed 2026-11-18)</sub></p>
+<p align="center"><sub>Made by <a href="https://github.com/lethehaiau">Au Le</a></sub></p>
