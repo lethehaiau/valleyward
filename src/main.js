@@ -41,10 +41,29 @@ const bootT0 = performance.now();
 const cover = document.getElementById('loading');
 const uiRoot = document.getElementById('ui') || document.body;
 if (P.noui) uiRoot.style.display = 'none';
-function setProgress(fraction) {
-  if (cover) cover.dataset.p = String(Math.round(fraction * 100));
+// The loading bar (index.html's #loading .ld-bar). Each boot step sets where the bar is and where the next step will
+// leave it; in between, the bar creeps toward that ceiling (never reaching it), so a long step such as the shader
+// compile never looks frozen. The bar only moves forward.
+const bar = cover?.querySelector('.ld-bar') ?? null;
+const barStep = cover?.querySelector('.ld-step') ?? null;
+const load = { shown: 0, done: 0, next: 0, timer: 0 };
+function paintBar() {
+  if (!bar) return;
+  bar.style.setProperty('--f', load.shown.toFixed(4));
+  bar.setAttribute('aria-valuenow', String(Math.round(load.shown * 100)));
 }
-setProgress(0.02);
+/** @param {number} fraction reached now (0..1) @param {number} [next] where the step under way ends @param {string} [label] */
+function setProgress(fraction, next = fraction, label) {
+  load.done = Math.max(load.done, fraction);
+  load.next = Math.max(load.done, next);
+  load.shown = Math.max(load.shown, load.done);
+  if (label && barStep) barStep.textContent = label;
+  bar?.classList.add('live');
+  paintBar();
+  if (load.done >= 1) { clearInterval(load.timer); load.timer = 0; return; }
+  load.timer ||= setInterval(() => { load.shown += (load.next - load.shown) * 0.05; paintBar(); }, 100);
+}
+setProgress(0.03, 0.12, 'LOADING');
 
 // decision 0001: ?gpu= wins, then the backend of the fire modules picked, else webgl2 (src/gfx/index.js)
 const query = new URLSearchParams(globalThis.location?.search || '');
@@ -290,7 +309,7 @@ function uiOptions() {
 }
 
 async function loadParts() {
-  setProgress(0.1);
+  setProgress(0.12, 0.6, 'LOADING THE VALLEY');
   // every chunk is requested now: fx and cinema are made after the first group, but need not download after it
   prefetchLanes(undefined, (lane) => !gfx.LANES[lane] || (!!artOff && lane !== 'ui' && lane !== 'audio'));
   const quality = P.quality;
@@ -302,15 +321,18 @@ async function loadParts() {
     ['ui', (m) => m.createUI(uiOptions()), false],
     ['audio', (m) => m.createAudio({ assetsBase }), false],
   ];
-  const load = ([lane, make, art]) => loadLane(lane, make, { disabled: offReason(lane, art !== false) });
-  const made = await Promise.all(first.map(load));
+  let loaded = 0;   // the bar moves as each part arrives (they load in parallel)
+  const loadOne = ([lane, make, art]) => loadLane(lane, make, { disabled: offReason(lane, art !== false) })
+    .then((made) => { loaded++; setProgress(0.12 + 0.48 * (loaded / first.length), 0.6); return made; });
+  const made = await Promise.all(first.map(loadOne));
   first.forEach(([lane], k) => { part[lane] = made[k]; });
   for (const [lane] of first) up[lane] = !!report[lane].ok;
-  setProgress(0.6);
+  setProgress(0.6, 0.72, 'GATHERING THE HORDE');
   // fx and the cinema take the parts above as arguments
   const fxArgs = () => ({ scene, camera, quality, actors: liveOrNull('actors') });
   part.fx = await loadLane('fx', (m) => m.createFx(fxArgs()), { disabled: offReason('fx') });
   up.fx = !!part.fx;
+  setProgress(0.66, 0.72);
   const cinemaArgs = () => ({
     camera, actors: liveOrNull('actors'), env: liveOrNull('env'), look: liveOrNull('look'), ui: uiApi, audio: audioApi,
   });
@@ -327,7 +349,7 @@ async function loadParts() {
   if (P.mute) audioApi.setVolume(0);
   audioApi.setFire?.(sim.fire);
   setFireStyle(fireStyle);
-  setProgress(0.8);
+  setProgress(0.72, 0.86, 'LIGHTING THE LAMPS');
 }
 
 // ================================================================================================ sim events -> everyone
@@ -694,10 +716,14 @@ async function warmUp() {
     if (renderer.compileAsync) await renderer.compileAsync(scene, camera);
     else renderer.compile(scene, camera);
   } catch (e) { console.warn('[ew] shader warm-up', e); }
-  for (const lane of ['fire', 'fx', 'look', 'actors', 'env']) {
+  setProgress(0.86, 0.94, 'KINDLING THE FIRE');
+  const warmers = ['fire', 'fx', 'look', 'actors', 'env'];
+  for (const [k, lane] of warmers.entries()) {
     const inst = part[lane];
-    if (!up[lane] || !inst?.warm) continue;
-    try { await inst.warm(renderer, camera); } catch (e) { console.warn(`[ew] ${lane}.warm`, e); }
+    if (up[lane] && inst?.warm) {
+      try { await inst.warm(renderer, camera); } catch (e) { console.warn(`[ew] ${lane}.warm`, e); }
+    }
+    setProgress(0.86 + 0.08 * ((k + 1) / warmers.length), 0.94);
   }
   const homePos = camera.position.clone(), homeQuat = camera.quaternion.clone();
   const draw = () => {
@@ -721,6 +747,7 @@ async function warmUp() {
   camera.position.copy(homePos);
   camera.quaternion.copy(homeQuat);
   warmMs = Math.round(performance.now() - begun);
+  setProgress(0.97, 0.99);
 }
 
 // ================================================================================================ visibility, resize, counters

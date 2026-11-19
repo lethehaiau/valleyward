@@ -103,7 +103,8 @@ file's header gives its command.
 | P / Esc | the menu (Resume, Restart night, Fire style, Controls) |
 | H | controls |
 
-The loading cover turns into "CLICK TO BEGIN" (the gesture unlocks audio). The intro (6 s) can be skipped after 1.5 s with Space, Enter, E or a click.
+A loading bar shows each boot step on the loading cover, which then turns into "CLICK TO BEGIN" (the gesture unlocks
+audio). The intro (6 s) can be skipped after 1.5 s with Space, Enter, E or a click.
 
 ## URL parameters (DESIGN §14.8)
 

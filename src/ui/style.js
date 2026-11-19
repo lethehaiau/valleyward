@@ -10,6 +10,8 @@ export function buildCss(fontsUrl) {
 @font-face{font-family:'EW Silkscreen';src:url('${fontsUrl}silkscreen-400-latin.woff2') format('woff2');font-weight:400;font-display:block}
 @font-face{font-family:'EW Silkscreen';src:url('${fontsUrl}silkscreen-700-latin.woff2') format('woff2');font-weight:700;font-display:block}
 @font-face{font-family:'EW Pixelify';src:url('${fontsUrl}pixelify-sans-latin.woff2') format('woff2');font-weight:400 700;font-display:block}
+/* the loading cover's own alias of the same file: font-display swap, so its text shows in a fallback font while the file loads (the HUD keeps block) */
+@font-face{font-family:'EW Silkscreen Cover';src:url('${fontsUrl}silkscreen-400-latin.woff2') format('woff2');font-weight:400;font-display:swap}
 
 .ewui{--k:3;--p:calc(var(--k) * 1px);--ink:#f3f5f1;--ink2:#bccbd2;--dim:#7d909b;--line:#0a1115;--slate:rgba(15,23,29,.88);
   --slate2:#22313b;--edge:#4e6573;--edge2:#7d97a5;--hp:#d9342b;--hp2:#8e1a14;--xp:#e9c64b;--xp2:#8f7420;--fuel:#f18b25;--fuel2:#93430c;
@@ -298,7 +300,7 @@ export function buildCss(fontsUrl) {
 .ew-end.night .ew-endc{padding:1.1em 2em 1.2em;background:radial-gradient(ellipse at 50% 50%,rgba(5,9,11,.62),rgba(5,9,11,0) 70%)}
 
 /* the standalone cover (#loading, the page's markup or ui.titleCover's): the wordmark over a moonlit keep silhouette */
-#loading{--k:2.5;--p:calc(var(--k) * 1px);--line:#0a1115;--edge2:#7d97a5;font-family:'EW Silkscreen',ui-monospace,monospace!important;font-size:calc(var(--k) * 8px)!important;
+#loading{--k:2.5;--p:calc(var(--k) * 1px);--line:#0a1115;--edge2:#7d97a5;font-family:'EW Silkscreen Cover',ui-monospace,monospace!important;font-size:calc(var(--k) * 8px)!important;
   color:#f3f5f1!important;-webkit-font-smoothing:none;letter-spacing:0!important;
   background:radial-gradient(circle at 62% 70.2%,#fff2b8 0,#ffd24a .45vmin,#ff9a2e .9vmin,rgba(232,90,28,.45) 1.6vmin,rgba(232,90,28,.12) 4vmin,rgba(232,90,28,0) 7vmin),radial-gradient(circle at 74% 26%,rgba(190,240,246,.20) 0,rgba(120,200,212,.10) 9%,rgba(11,28,36,0) 30%),linear-gradient(180deg,#0c2530 0%,#123642 46%,#0e2a33 64%,#071419 100%)!important;overflow:hidden}
 @media (min-width:1600px){#loading{--k:3.5}}
@@ -312,6 +314,8 @@ export function buildCss(fontsUrl) {
 #loading>div>div:last-child{font-size:.62em!important;letter-spacing:.3em!important;margin-top:2.2em!important;opacity:1!important;color:#a4e6ee;animation:ew-blink 1.1s steps(1) infinite}
 #loading .ew-coversub{font-family:'EW Pixelify',monospace;font-size:.62em;color:#bccbd2;letter-spacing:.06em;word-spacing:.3em;margin-top:1.6em}
 #loading .ew-coverline{margin-top:1.6em!important}
+/* the loading bar's step line (index.html): steady, not the title's blinking call to action */
+#loading .ld .ld-step{animation:none;font-size:.5em!important;margin-top:1.3em!important;opacity:.9!important}
 #loading::marker{content:none}
 
 @keyframes ew-xptick{0%{filter:brightness(1.9)}100%{filter:brightness(1)}}

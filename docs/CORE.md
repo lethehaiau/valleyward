@@ -62,6 +62,14 @@ viewmodel), `docs/PRES.md` (HUD, menus, FX, cutscenes), `docs/AUDIO.md`, and `do
 5. **The warm-up**, behind the loading cover: compile every program, call each part's `warm()`, draw from four far-apart
    lenses, light a little fire and douse it, then **reset the fire modules** (a gameplay grid read back late from the
    warm-up fire once reached the sim and lit an oil barrel). Then four frames to let the GPU drain.
+
+   **The loading bar** (`index.html`'s `#loading .ld-bar`, driven by `setProgress` in `src/main.js`) follows these steps:
+   LOADING (the edition chunk) to 12 %, LOADING THE VALLEY (each of the six parts as it arrives) to 60 %, GATHERING THE
+   HORDE (fx, cinema) to 72 %, LIGHTING THE LAMPS (the shader compile) to 86 %, KINDLING THE FIRE (each part's `warm()`,
+   the lenses, the fire) to 97 %, then 100 % and the title. Between steps it creeps toward the next one, so a long
+   compile never looks frozen; it only moves forward. It is in the page itself (no JavaScript needed to show it) and
+   cool cyan-white, not fire-orange (ART-DIRECTION §3). The cover's text uses its own `font-display: swap` alias of
+   Silkscreen, preloaded by `index.html`, so the wordmark never vanishes while the HUD fonts load.
 6. **The start.** The cover becomes "CLICK TO BEGIN" (the AudioContext and the pointer lock need a gesture). A first
    launch (an empty save) goes straight into Night I's intro; a save with anything in it starts at the camp. URL
    parameters can skip this: `?camp=1`, `?ending=1`, `?night=N`, `?skipintro=1`, `?autoplay=1`.
