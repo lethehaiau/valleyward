@@ -4,6 +4,9 @@ A first-person horde survivor at a hilltop keep, with a real-time fluid fire. It
 in a WebGL2 and a WebGPU edition. Hold the gate of Valleyward Keep through ten nights against thousands of pixel
 goblins, the Ash Troll and the Rainmother, with gun and fire.
 
+**Play it: [valleyward.app](https://valleyward.app)** · the WebGPU edition:
+[valleyward.app/?gpu=webgpu](https://valleyward.app/?gpu=webgpu)
+
 > Formerly EMBERWATCH (renamed 2026-11-18; another game already uses that name). Some asset provenance records still
 > use the old name.
 
