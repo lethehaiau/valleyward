@@ -36,6 +36,7 @@ export const PARAMS = Object.freeze({
   debug: isOn('debug'),                       // the overlay and the gameplay fire grid on the ground
   perf: isOn('perf'),
   gpuPerf: isOn('gpuPerf'),
+  firePerf: isOn('firePerf'),
   god: isOn('god'),
   speed: within(numberOf('speed', 1), 0.1, 8),
   fps: within(Math.floor(numberOf('fps', 60)), 0, 240),   // DESIGN §15: the frame cap; 0 draws every display frame

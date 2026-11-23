@@ -45,10 +45,11 @@ used here, v0.2.0: [10.5281/zenodo.24364837](https://doi.org/10.5281/zenodo.2436
 - **Two shading layers.** The game has `src/gfx/webgl2` and `src/gfx/webgpu`, and boots the one that matches the
   picked modules' backend. `?gpu=webgl2|webgpu` forces one. The **Renderer** toggle in the **P** menu asks for
   confirmation before reloading the game and keeps compatible slot selections. WebGPU is disabled when the browser lacks its API.
-- **Local catalog.** The dev server reads `dev/catalog.json` from the linked Firewraith checkout on startup. Its
-  modules work by short ID, and **Lance module** in the **P** menu lists the current renderer's choices when local
-  Lance modules are available. Selecting one reloads with `?lance=<id>`. For a local startup default, run
-  `VALLEYWARD_DEV_LANCE=lance-curved-volume npm run dev` from Valleyward. Explicit URL choices take precedence.
+- **Local Firewraith modules.** Link the Firewraith checkout, add `modules/<id>/`, and register the same ID in
+  Firewraith's `modules/catalog.js`. Restart Valleyward's dev server and open `?lance=<id>` or `?ground=<id>`.
+  **P → Lance module** lists the compatible catalog entries in dev when there is more than one choice.
+  Selecting one reloads with `?lance=<id>`. To start with a catalog entry, run `VALLEYWARD_DEV_LANCE=<id> npm run dev`,
+  replacing `<id>` with the registered Lance ID. Explicit URL choices take precedence.
 - **The WebGPU edition is complete** (`docs/WEBGPU-PORT.md`). It runs three's `WebGPURenderer` with the world, the look,
   the actors, the fx and Firewraith's `classic-webgpu` fire, which is its default and fallback module. Its frame time
   isn't measured yet. If something looks off, compare it with the WebGL2 edition.
@@ -159,3 +160,28 @@ authors' licence, so they stay private. A clone builds and plays the game **sile
 breaks. With an audio set in `.private/audio/` (or the folder in `VALLEYWARD_AUDIO_DIR`), `npm run dev` serves it and
 `npm run build` copies it into `dist/assets/audio/` (`tools/vite-audio.mjs`). To make your own set, see `docs/AUDIO.md`:
 the prompts and the build are here.
+## Check a Firewraith module
+
+With a registered module in the linked Firewraith checkout, run:
+
+```sh
+npm run module:check -- my-fire --slot lance
+```
+
+The command prints the resolved Firewraith directory, checks the ID and slot, and prints the matched candidate and
+Classic URLs. It uses the local dev server on port 5350 or starts one on 5359. Use `--url` for another running dev
+server, `--preflight` for the paths and URLs alone, or `--slot ground` to test a ground module. `CHROME_BIN` can select
+a Chrome installation. The GPU lock and disposable browser profile keep the run isolated. If the workspace sandbox
+prevents Chrome from launching or Vite from binding loopback, run from an approved local environment.
+
+The first-person fixture uses High, Smooth, seed 4, and 1920×1080 at DPR 1. It replays a tap, hold, redirect and release
+for Lance or a fixed burst for ground. It verifies the loaded modules and backend, compares paused and occluded
+pixels, and fails with the browser error or slot fallback reason. Look in `.scratch/module-check/` for the JSON
+report and matched screenshots. Check the active frames visually for shape and readability. Starter modules can
+pass the lifecycle checks while copying the scene unchanged.
+
+`?firePerf=1` enables host-owned fire timing in `__ew.perf().fireTiming`. Update and composite GPU samples are
+paired by frame from completed WebGL2 queries. The combined value excludes the rest of the render. CPU submission
+and rendered frame intervals are separate fields. Backends without WebGL2 elapsed queries report `gpuMs: null`.
+`__ew.perf().fire.modules` includes `requested`, resolved `id`, state and fallback reason for each slot.
+`__ew.perf().fire.slots` holds each module's own stats, which can be shared when the same module fills both slots.

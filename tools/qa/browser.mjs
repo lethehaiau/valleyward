@@ -60,14 +60,17 @@ export async function startPreview(port, outDir, opts = {}) {
 // ---- the browser -----------------------------------------------------------------------------------------------------
 /**
  * Launch headless Chrome with this machine's GL flags and WebGPU exposed (the webgpu edition, decision 0001).
- * @param {{ width?: number, height?: number, uncapped?: boolean }} [o] uncapped: no vsync and no frame-rate limit
+ * @param {{ width?: number, height?: number, uncapped?: boolean, userDataDir?: string }} [o] uncapped: no vsync and no frame-rate limit
  */
-export function launch({ width = 1280, height = 720, uncapped = false } = {}) {
+export function launch({ width = 1280, height = 720, uncapped = false, userDataDir } = {}) {
   const args = chromeGLArgs();
   args.push('--enable-unsafe-webgpu', '--autoplay-policy=no-user-gesture-required', '--no-first-run',
     '--no-default-browser-check', `--window-size=${width},${height}`);
   if (uncapped) args.push('--disable-gpu-vsync', '--disable-frame-rate-limit');
-  return puppeteer.launch({ executablePath: CHROME, headless: true, args, defaultViewport: { width, height } });
+  return puppeteer.launch({
+    executablePath: CHROME, headless: true, args, defaultViewport: { width, height },
+    ...(userDataDir && { userDataDir, pipe: true }),
+  });
 }
 
 /**

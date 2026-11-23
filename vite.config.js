@@ -31,42 +31,19 @@ const licenseNotices = {
 // and the game share one three.js.
 // The audio files are not in the repo: tools/vite-audio.mjs adds them when present locally, else the game is silent.
 const firewraith = (() => { try { return fs.realpathSync(path.resolve('node_modules/firewraith')); } catch { return null; } })();
-function readDevFireCatalog() {
-  const dir = firewraith && path.join(firewraith, 'dev');
-  const manifest = dir && path.join(dir, 'catalog.json');
-  const entries = manifest && fs.existsSync(manifest) ? JSON.parse(fs.readFileSync(manifest, 'utf8')) : [];
-  if (!Array.isArray(entries)) throw new Error('Firewraith dev/catalog.json must contain an array of modules');
-  const ids = new Set();
-  const modules = entries.map(({ id, name, backend, slots, entry }) => {
-    if (typeof id !== 'string' || !/^[a-z0-9][a-z0-9-]{0,39}$/.test(id) || ids.has(id) ||
-        Object.hasOwn(MODULES, id) || typeof name !== 'string' || !name.trim() ||
-        !['webgl2', 'webgpu'].includes(backend) || !Array.isArray(slots) || !slots.length ||
-        slots.some((slot) => !['lance', 'ground'].includes(slot))) {
-      throw new Error(`Invalid or duplicate Firewraith dev module in ${manifest}: ${id}`);
-    }
-    if (typeof entry !== 'string' || !entry.endsWith('.js') ||
-        entry.split('/').some((p) => !p || p === '.' || p === '..' || p.includes('\\'))) {
-      throw new Error(`Invalid entry for Firewraith dev module ${id}: ${entry}`);
-    }
-    const file = path.join(dir, entry);
-    if (!fs.existsSync(file) || !fs.realpathSync(file).startsWith(dir + path.sep) || !fs.statSync(file).isFile()) {
-      throw new Error(`Missing Firewraith dev entry inside ${dir}: ${entry}`);
-    }
-    ids.add(id);
-    return { id, name, backend, slots, url: '/node_modules/firewraith/dev/' + entry.split('/').map(encodeURIComponent).join('/') };
-  });
+function readDevLance() {
   const lance = process.env.VALLEYWARD_DEV_LANCE || '';
-  if (lance && !modules.some((m) => m.id === lance && m.slots.includes('lance'))) {
-    throw new Error(`VALLEYWARD_DEV_LANCE=${lance} does not name a Lance in Firewraith's dev/catalog.json`);
+  if (lance && !MODULES[lance]?.info?.slots.includes('lance')) {
+    throw new Error(`VALLEYWARD_DEV_LANCE=${lance} does not name a Lance in Firewraith's modules/catalog.js`);
   }
-  return { modules, lance };
+  return lance;
 }
 
 export default defineConfig(({ command, isPreview }) => ({
   base: './',
   plugins: [audioAssets(), licenseNotices],
   define: {
-    __EW_LOCAL_FIRE__: JSON.stringify(command === 'serve' && !isPreview ? readDevFireCatalog() : { modules: [], lance: '' }),
+    __EW_DEV_LANCE__: JSON.stringify(command === 'serve' && !isPreview ? readDevLance() : ''),
   },
   css: { postcss: { plugins: [] } },
   resolve: { dedupe: ['three'] },
