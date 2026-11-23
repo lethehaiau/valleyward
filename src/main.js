@@ -344,7 +344,7 @@ function fireMenuSettings() {
   if (setups.length > 1) {
     settings.push({
       id: 'firemod', label: 'Fire module', customLabel: 'Custom mix',
-      selected: () => setupFor(running(), gfx.edition),
+      selected: () => setupFor(running(), gfx.edition, query.get('firemod') ?? ''),
       choices: setups.map(({ id, name }) => ({ id, label: name })),
       choose: (id) => reloadFireSettings(setupQuery(query, id)),
     });

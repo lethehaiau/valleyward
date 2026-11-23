@@ -6,10 +6,12 @@ import { checkInfo, API_VERSION } from 'firewraith/api';
 import { info as classicInfo } from 'firewraith/modules/classic/info';
 import { info as classicGpuInfo } from 'firewraith/modules/classic-webgpu/info';
 import {
-  REGISTRY, SLOTS, fallbackFor, pickedModules, isDevUrl, isLoadable, rendererQuery, setupFor, setupOf, setupOptions,
-  setupQuery, slotOptions, slotQuery,
+  REGISTRY, SETUPS, SLOTS, fallbackFor, pickedModules, isDevUrl, isLoadable, rendererQuery, requestedModules, setupFor,
+  setupOf, setupOptions, setupQuery, slotOptions, slotQuery,
 } from '../src/core/fire-registry.js';
 import { MODULES } from 'firewraith/modules';
+import { SETUPS as FIREWRAITH_SETUPS } from 'firewraith/setups';
+import { checkSetup } from 'firewraith/api';
 import { makeWorld } from '../src/fire/world.js';
 import { pickEdition } from '../src/gfx/index.js';
 import { ARENA, groundHeight } from '../src/shared/arena.js';
@@ -65,8 +67,12 @@ test('the Fire module choices: one setup per listed module of the edition, its r
     assert.deepEqual(setups.map(({ id }) => id).sort(), ids.sort(), edition);
     assert.equal(setups[0].id, fallbackFor(edition), edition);
     for (const { id, name, picks } of setups) {
-      assert.equal(name, MODULES[id].info.name, id);
-      for (const slot of SLOTS) assert.equal(picks[slot], MODULES[id].info.slots.includes(slot) ? id : fallbackFor(edition), `${id} ${slot}`);
+      const named = SETUPS[id]?.backend === edition ? SETUPS[id] : null;
+      assert.equal(name, named ? named.name : MODULES[id].info.name, id);
+      for (const slot of SLOTS) {
+        const want = named ? named.slots[slot] : MODULES[id].info.slots.includes(slot) ? id : fallbackFor(edition);
+        assert.equal(picks[slot], want, `${id} ${slot}`);
+      }
       assert.equal(setupFor(picks, edition), id, id);
       assert.deepEqual(pickedModules(setupQuery(Q(''), id), edition), picks, id);
     }
@@ -101,12 +107,40 @@ test('menu reloads keep other settings: a setup drops the per-slot picks, a slot
   assert.equal(start.toString(), 'gpu=webgl2&lance=classic&ground=classic&seed=4&fire=smooth');
 });
 
-test('a renderer switch keeps a one-slot setup\'s module only where it runs', () => {
+test('a renderer switch keeps a setup\'s modules only where they run', () => {
   const gl = rendererQuery(Q('?firemod=lance-curved-volume'), 'webgl2');
   assert.equal(gl.get('lance'), 'lance-curved-volume');
-  assert.ok(!gl.has('ground') && !gl.has('firemod'));
+  assert.equal(gl.get('ground'), 'classic');
+  assert.ok(!gl.has('firemod'));
   const gpu = rendererQuery(Q('?firemod=lance-curved-volume'), 'webgpu');
   assert.ok(!gpu.has('lance') && !gpu.has('ground') && !gpu.has('firemod'));
+});
+
+test('Firewraith\'s setups are read as they are, each checked against the catalog', () => {
+  assert.deepEqual(Object.keys(SETUPS), Object.keys(FIREWRAITH_SETUPS));
+  for (const [id, setup] of Object.entries(SETUPS)) assert.deepEqual(checkSetup(id, setup, MODULES), [], id);
+  assert.deepEqual({ ...SETUPS['lance-curved-volume'].slots }, { lance: 'lance-curved-volume', ground: 'classic' });
+});
+
+test('a setup that is not a module joins the choices, and ?firemod= plays its picks', () => {
+  const setups = { ...SETUPS,
+    storm: { name: 'Storm', backend: 'webgl2', slots: { lance: 'lance-curved-volume', ground: 'classic' } },
+    'classic-mix': { name: 'Classic mix', backend: 'webgpu', slots: { lance: 'classic-webgpu', ground: 'classic-webgpu' } },
+    classic: { name: 'Classic + Curved', backend: 'webgl2', slots: { lance: 'lance-curved-volume', ground: 'classic' } },
+  };
+  const gl = setupOptions('webgl2', setups);
+  assert.deepEqual(gl.map(({ id }) => id), ['classic', 'lance-curved-volume', 'storm']);
+  assert.deepEqual(gl[0], { id: 'classic', name: 'Classic + Curved', picks: { lance: 'lance-curved-volume', ground: 'classic' } });
+  assert.deepEqual(setupOptions('webgpu', setups).map(({ id }) => id), ['classic-webgpu', 'classic-mix']);
+  assert.deepEqual(requestedModules(Q('?firemod=storm'), setups), { lance: 'lance-curved-volume', ground: 'classic' });
+  assert.deepEqual(requestedModules(Q('?firemod=storm&ground=x'), setups), { lance: 'lance-curved-volume', ground: 'x' });
+  assert.deepEqual(setupOf('storm', 'webgl2', setups), { lance: 'lance-curved-volume', ground: 'classic' });
+  assert.equal(setupFor({ lance: 'classic-webgpu', ground: 'classic-webgpu' }, 'webgpu', '', setups), 'classic-webgpu');
+  // two setups with the same picks: the one asked for is the one shown
+  const same = { lance: 'lance-curved-volume', ground: 'classic' };
+  assert.equal(setupFor(same, 'webgl2', '', setups), 'classic');
+  assert.equal(setupFor(same, 'webgl2', 'storm', setups), 'storm');
+  assert.equal(setupFor(same, 'webgl2', 'classic-webgpu', setups), 'classic');
 });
 
 test('only listed ids and localhost URLs load', () => {

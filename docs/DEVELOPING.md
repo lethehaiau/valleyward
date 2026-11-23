@@ -37,8 +37,9 @@ used here, v.0.2.1: [10.5281/zenodo.24476634](https://doi.org/10.5281/zenodo.244
   - `lance`: the Ember Lance's flame;
   - `ground`: the fire on the ground.
 
-  `?firemod=` picks a whole setup: the module fills the slots it declares and the edition's reference module fills
-  the others, so `?firemod=lance-curved-volume` is that Lance over the classic ground fire. `?lance=` and `?ground=`
+  `?firemod=` picks a whole setup, one module per slot. Firewraith's setups (`firewraith/setups`, each checked with
+  `checkSetup`) name them: `?firemod=lance-curved-volume` is that Lance over the classic ground fire. A module without
+  a setup fills the slots it declares, and the edition's reference module fills the others. `?lance=` and `?ground=`
   override one slot. Each takes a listed id (`classic`) or, for development, a module URL on this machine
   (`http://localhost:…`, which `?firemod=` asks for in both slots).
 - **A module that is missing, invalid or throws** is replaced by `classic` for its slots.
@@ -50,8 +51,8 @@ used here, v.0.2.1: [10.5281/zenodo.24476634](https://doi.org/10.5281/zenodo.244
 - **Local Firewraith modules.** Link the Firewraith checkout, add `modules/<id>/`, and register the same ID in
   Firewraith's `modules/catalog.js`. Restart Valleyward's dev server and open `?firemod=<id>`, `?lance=<id>` or
   `?ground=<id>`.
-- **P → Fire module** lists the edition's catalog modules as whole setups, in production too, when there is more than
-  one. Selecting one reloads with `?firemod=<id>`. A mix that matches no setup shows as **Custom mix**. In dev, the
+- **P → Fire module** lists the edition's setups, in production too, when there is more than one: one per catalog
+  module (Firewraith's setup under that ID, else the module's own), then Firewraith's other setups. Selecting one reloads with `?firemod=<id>`. A mix that matches no setup shows as **Custom mix**. In dev, the
   advanced **Lance module** and **Ground module** rows pick one slot at a time and reload with `?lance=<id>` or
   `?ground=<id>`. To start with a catalog entry, run `VALLEYWARD_DEV_LANCE=<id> npm run dev`,
   replacing `<id>` with the registered Lance ID. Explicit URL choices take precedence.
