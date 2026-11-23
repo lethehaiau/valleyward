@@ -1,0 +1,143 @@
+#ew-rotate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  place-items: center;
+  padding: 24px;
+  background: #0b1c24;
+  color: #fff3d6;
+  text-align: center;
+  font: 18px 'EW Silkscreen', monospace;
+}
+@media (pointer: coarse) and (hover: none) and (orientation: portrait) {
+  #ew-rotate { display: grid; }
+}
+
+.ew-touch #world canvas {
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+.ew-touch-hud {
+  position: absolute;
+  inset: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  z-index: 4;
+  pointer-events: none;
+  user-select: none;
+  --stick: clamp(84px, 26dvh, 116px);
+  --button: clamp(44px, 15dvh, 62px);
+  --fire: clamp(60px, 19dvh, 80px);
+}
+.ew-touch-hud [hidden] { display: none; }
+.ew-touch-hud :is(.ew-touch-stick, .ew-touch-button) { pointer-events: auto; }
+.ew-touch-stick, .ew-touch-button {
+  -webkit-tap-highlight-color: transparent;
+  border: 1px solid #a4e6e9a6;
+  color: #f8ead3;
+  background: #0b1c24d9;
+  border-radius: 8px;
+}
+.ew-touch-stick {
+  position: absolute;
+  touch-action: none;
+  left: 0;
+  bottom: 0;
+  width: var(--stick);
+  height: var(--stick);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.ew-touch-stick span {
+  width: 48%;
+  height: 48%;
+  border-radius: 50%;
+  background: #41727ebf;
+  box-shadow: inset 0 0 0 1px #a4e6e9ab;
+  pointer-events: none;
+}
+.ew-touch-button {
+  display: grid;
+  place-items: center;
+  min-height: var(--button, 44px);
+  min-width: var(--button, 44px);
+  font: 12px 'EW Silkscreen', monospace;
+  padding: 4px 8px;
+  touch-action: manipulation;
+}
+.ew-touch-button:active, .ew-touch-button.held, .ew-touch-button[aria-pressed="true"] { background: #30515d; }
+.ew-touch-button:disabled { opacity: .45; }
+.ew-touch-hud button { position: absolute; }
+.ew-touch-hud [data-touch="fire"] {
+  bottom: 0;
+  right: 0;
+  width: var(--fire);
+  height: var(--fire);
+  border-radius: 50%;
+  touch-action: none;
+  border-color: #edbb8a;
+  background: #4a211ae6;
+}
+.ew-touch-hud [data-touch="fire"].held { background: #a44730; }
+.ew-touch-hud [data-touch="pause"] { top: 0; right: 0; }
+.ew-touch-hud [data-touch="jump"] { bottom: 0; right: calc(var(--fire) + 9px); }
+.ew-touch-hud [data-touch="reload"] { bottom: calc(var(--fire) + 8px); right: 0; }
+.ew-touch-hud [data-touch="weapon"] { bottom: calc(var(--button) + 9px); right: calc(var(--fire) + 12px); }
+.ew-touch-hud [data-touch="bomb"] { bottom: calc(var(--button) * 2 + 17px); right: calc(var(--fire) + 12px); }
+.ew-touch-hud [data-touch="ult"] { bottom: calc(var(--fire) + var(--button) + 16px); right: 0; }
+.ew-touch-hud [data-touch="sprint"] { bottom: calc(var(--stick) + 8px); left: 0; }
+.ew-touch-hud [data-touch="kindle"] { bottom: 0; left: 50%; transform: translateX(-50%); }
+.ew-touch-hud[data-mode="camp"] [data-touch="kindle"] {
+  left: auto;
+  right: 0;
+  bottom: calc(var(--button) + 8px);
+  transform: none;
+}
+.ew-touch-hud[data-mode="camp"] [data-touch="jump"] { right: 0; }
+#loading .ew-title-fullscreen {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+}
+.ew-touch #loading .ew-coverlinks {
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+}
+.ew-touch .ewui {
+  inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.ew-touch .ewui .ew-hints,
+.ew-touch .ewui .ew-prompt .ew-key,
+.ew-touch .ewui .ew-ckey,
+.ew-touch .ewui .ew-begin .ew-key,
+.ew-touch .ewui .ew-begintip,
+.ew-touch .ewui .ew-shop .ew-key,
+.ew-touch .ewui .ew-shint,
+.ew-touch .ewui .ew-keyboard-hint { display: none; }
+.ew-touch .ewui .ew-bl { left: max(126px, 24%); }
+.ew-touch .ewui .ew-br { top: 58px; bottom: auto; }
+.ew-touch .ewui .ew-bkey,
+.ew-touch .ewui .ew-qkey,
+.ew-touch .ewui .ew-slots,
+.ew-touch .ewui .ew-rhint { display: none; }
+.ew-touch .ewui .ew-menu .ew-panel,
+.ew-touch .ewui .ew-controls .ew-panel,
+.ew-touch .ewui .ew-cwrap,
+.ew-touch .ewui .ew-endc {
+  max-height: 94%;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.ew-touch .ewui .ew-btn,
+.ew-touch .ewui .ew-srow,
+.ew-touch .ewui .ew-crow2,
+.ew-touch .ewui .ew-beginbtn,
+.ew-touch .ewui .ew-item { min-height: 44px; }
+.ew-touch .ewui .ew-crow { gap: .6em; }
+.ew-touch .ewui .ew-card { width: min(27vw, 9.6em); }
+.ew-touch .ewui .ew-skip.on { pointer-events: auto; min-height: 44px; }
+.ew-touch .ewui .ew-skip:not(.on) { display: none; }
+.ew-touch .ewui .ew-shop-close { align-self: flex-end; margin-top: .4em; }

@@ -108,11 +108,22 @@ const CONTROLS = [
   ['Controls', ['H']],
   ['Menu', ['Esc']],
 ];
+const TOUCH_CONTROLS = [
+  ['Move', ['Left stick'], 'tap Sprint to toggle'],
+  ['Look', ['Swipe']],
+  ['Fire and aim', ['Hold Fire'], 'drag to turn while firing'],
+  ['Jump and abilities', ['Tap'], 'Jump, Bomb, or Sunburst'],
+  ['Weapons', ['Weapon'], 'cycles unlocked weapons'],
+  ['Reload', ['Reload']],
+  ['Use objects', ['Kindle / Interact'], 'when in reach'],
+  ['Menu', ['Pause']],
+];
 
 /**
  * @param {{ root?: HTMLElement|null, assetsBase?: string, noui?: boolean, keys?: boolean,
  *           fireStyle?: 'smooth'|'hybrid', cardDefs?: Record<string, any>,
- *           menuSettings?: import('../core/menu-select.js').MenuSetting[],
+ *           menuSettings?: import('../core/menu-select.js').MenuSetting[], touch?: boolean,
+ *           addFullscreen?: ((parent: HTMLElement, className: string) => void) | null,
  *           onAction?: (a: string, detail?: any) => void, onFireStyle?: (s: 'smooth'|'hybrid') => void }} [opts]
  */
 export function createUI(opts = {}) {
@@ -219,7 +230,7 @@ export function createUI(opts = {}) {
   const beginEl = h('div', 'ew-begin', ui, '<button type="button" class="ew-beginbtn ew-ts"><span class="ew-key">N</span><b>BEGIN NIGHT I</b></button>'
     + '<div class="ew-begintip ew-ts">Ready? Begin the night here — or kindle the lamp at the pan on the wall walk (E).</div>');
   const beginBtn = /** @type {HTMLButtonElement} */ (beginEl.firstChild), beginLbl = /** @type {HTMLElement} */ (beginBtn.lastChild);
-  const panMark = h('div', 'ew-wmark pan', ui, `<div class="ew-wbob"><i class="ew-wicon" style="${iconCss(ICON.lampUp, base + 'ui/')}"></i></div><b class="ew-ts">THE LAMP · E</b>`);
+  const panMark = h('div', 'ew-wmark pan', ui, `<div class="ew-wbob"><i class="ew-wicon" style="${iconCss(ICON.lampUp, base + 'ui/')}"></i></div><b class="ew-ts">THE LAMP${opts.touch ? '' : ' · E'}</b>`);
   const npcMark = h('div', 'ew-wmark npc', ui, `<div class="ew-wbob"><i class="ew-wicon" style="${iconCss(ICON.coinAnvil, base + 'ui/')}"></i></div><b class="ew-ts">BROTHER CINDER · UPGRADES</b>`);
 
   // no crosshair and no hit marker at the screen centre (DESIGN §13): src/fx flashes the impact point instead
@@ -240,7 +251,12 @@ export function createUI(opts = {}) {
   const fadeEl = h('div', 'ew-fade', ui);
   const captionEl = h('div', 'ew-caption ew-ts', ui, '');
   const creditsEl = h('div', 'ew-credits', ui, '');
-  const skipEl = h('div', 'ew-skip ew-ts', ui, '<span class="ew-key">SPACE</span>SKIP');
+  const skipEl = h(opts.touch ? 'button' : 'div', opts.touch ? 'ew-skip ew-ts ew-touch-button' : 'ew-skip ew-ts',
+    ui, opts.touch ? 'SKIP' : '<span class="ew-key">SPACE</span>SKIP');
+  if (opts.touch) {
+    skipEl.setAttribute('type', 'button');
+    skipEl.addEventListener('click', () => { if (endingSkippable(lastState)) skipEnding(); });
+  }
 
   // level-up cards
   const cardsEl = h('div', 'ew-modal ew-cards', ui);
@@ -314,8 +330,9 @@ export function createUI(opts = {}) {
   controlsBtn.type = 'button';
   controlsBtn.dataset.act = 'controls';
   menuRows.push(controlsBtn);
+  opts.addFullscreen?.(menuItems, 'ew-item ew-ts ew-touch-button');
   if (menuSelects.size) h('div', 'ew-hint ew-reload-hint', menuPanel, 'Module changes reload the game.');
-  h('div', 'ew-hint', menuPanel, 'P or Esc to resume');
+  h('div', 'ew-hint ew-keyboard-hint', menuPanel, 'P or Esc to resume');
   h('div', 'ew-menulinks', menuPanel, outLink(LINKS.repo, `${GH_MARK}<span>SOURCE ON GITHUB</span>`) + outLink(LINKS.fire, '<span>BUILD YOUR OWN FIRE</span>'));
 
   // controls overlay
@@ -325,11 +342,12 @@ export function createUI(opts = {}) {
   h('div', 'ew-pkick', ctlPanel, 'THE LAMPLIGHTER');
   h('div', 'ew-ptitle ew-ts', ctlPanel, 'CONTROLS');
   const grid = h('div', 'ew-ctl', ctlPanel);
-  for (const [action, keys, note] of CONTROLS) {
+  for (const [action, keys, note] of opts.touch ? TOUCH_CONTROLS : CONTROLS) {
     h('div', 'k', grid, /** @type {string[]} */ (keys).map((k) => `<span class="ew-key">${k}</span>`).join(''));
     h('div', 'a', grid, `${action}${note ? `<i>${note}</i>` : ''}`);
   }
-  const ctlHint = h('div', 'ew-hint', ctlPanel, 'H or Esc to close');
+  const closeControlsHint = opts.touch ? 'Tap to close' : 'H or Esc to close';
+  const ctlHint = h('div', 'ew-hint', ctlPanel, closeControlsHint);
 
   // end cards (night / dawn / fallen)
   const endEl = h('div', 'ew-modal ew-end', ui);
@@ -374,7 +392,7 @@ export function createUI(opts = {}) {
   const sound = (s) => { const n = SOUND[s] ?? s; if (!n) return; try { window.dispatchEvent(new CustomEvent('ew:ui', { detail: { sound: n } })); } catch { /* ignore */ } };
   const freePointer = () => { try { if (document.pointerLockElement) document.exitPointerLock(); } catch { /* ignore */ } };
   const schedule = (delay, run) => later.push({ at: now() + delay, run });
-  panels = createPanels({ root: ui, uiBase: base + 'ui/', h, esc, fitText, emit, sound, freePointer, now });
+  panels = createPanels({ root: ui, uiBase: base + 'ui/', h, esc, fitText, emit, sound, freePointer, now, touch: opts.touch });
 
   // DESIGN §9 state: the camera for the name plates (opts.camera or setCamera, the cinema passes it), the gold counter,
   // the camp, the run's end, Brother Cinder's lines
@@ -501,7 +519,7 @@ export function createUI(opts = {}) {
     /** @returns {Promise<string>} 'resume' | 'restart' */
     open() {
       if (menuOpen) return new Promise((r) => { const prev = menuResolve; menuResolve = (v) => { prev?.(v); r(v); }; });
-      if (cardsState || endState) return Promise.resolve('resume');
+      if ((cardsState && !cardsState.done) || (endState && !endState.done && endState.buttons.length)) return Promise.resolve('resume');
       for (const setting of menuSelects.values()) setting.refresh();
       menuOpen = true; menuSel = 0; hoverArmed = false; armRestart(false); paintMenu(); freePointer();
       setClass(menuEl, 'on', true);
@@ -527,7 +545,7 @@ export function createUI(opts = {}) {
     open() { if (ctlOpen) return; ctlOpen = true; freePointer(); setClass(ctlEl, 'on', true); emit('controls-open'); sound('open'); },
     close() {
       if (!ctlOpen) return; ctlOpen = false; setClass(ctlEl, 'on', false); emit('controls-close'); sound('close');
-      if (ctlFirst) { ctlFirst = false; ctlHint.textContent = 'H or Esc to close'; }
+    if (ctlFirst) { ctlFirst = false; ctlHint.textContent = closeControlsHint; }
       if (nightCardHeld) { const a = nightCardHeld; nightCardHeld = null; card('night', a[0], a[1]); }   // the night's title, held behind the panel
       if (!helpSeen) { helpSeen = true; try { localStorage.setItem(HELP_KEY, '1'); } catch { /* a blocked store: this session only */ } }
     },
@@ -539,7 +557,7 @@ export function createUI(opts = {}) {
   // start counts (the title's click, then the intro: no save yet); URL shortcuts and the camp never open it. H / Esc / a click close it, and so does any game key,
   // which then goes on to the game, so the first step is not lost. Once closed it never opens again (a localStorage flag,
   // try/catch: a blocked store shows it once a session).
-  const HELP_KEY = 'valleyward.controlsSeen.v1';
+  const HELP_KEY = opts.touch ? 'valleyward.touchControlsSeen.v1' : 'valleyward.controlsSeen.v1';
   let helpSeen = false; try { helpSeen = localStorage.getItem(HELP_KEY) === '1'; } catch { helpSeen = false; }
   let helpStage = 0, ctlFirst = false;   // 0 nothing yet · 1 the title seen · 2 its intro seen · 3 done
   /** @type {null | [any, any]} */ let nightCardHeld = null;   // a night title card that came while the first-launch panel was up
@@ -561,7 +579,8 @@ export function createUI(opts = {}) {
       if (now() - lastNightCard.at < 0.6) { nightCardHeld = [state, { night: state?.night?.n || lastNightCard.n || 1 }]; lastNightCard = { n: -1, at: -99 }; }
       closeEnd(null);
     }
-    helpStage = 3; ctlFirst = true; ctlHint.textContent = 'WASD to start · H, Esc or a click to close';
+    helpStage = 3; ctlFirst = true;
+    ctlHint.textContent = opts.touch ? closeControlsHint : 'WASD to start · H, Esc or a click to close';
     controls.open();
   }
 
@@ -605,7 +624,8 @@ export function createUI(opts = {}) {
     if (menuOpen) menu.close('resume');
     crow.innerHTML = '';
     const lv = lastState?.player?.level;
-    csub.textContent = lv ? `LV ${lv} · choose one (1 2 3 or click)` : 'Choose one (1 2 3 or click)';
+    const hint = opts.touch ? 'Tap one' : 'Choose one (1 2 3 or click)';
+    csub.textContent = lv ? `LV ${lv} · ${hint}` : hint;
     return new Promise((resolve) => {
       const els = ids.map((id, i) => {
         const d = cardDef(id, opts.cardDefs);
@@ -1413,7 +1433,7 @@ export function createUI(opts = {}) {
       const sb = clamp01(p.sunburst || 0);
       stepBar(sun, sb, dt, 0, 1, 2);
       const ready = sb >= 0.999;
-      if (ready !== sunReady) { sunReady = ready; setClass(sunEl, 'ready', ready); if (ready) toast('SUNBURST READY · Q', 2.0, 'cool'); }
+      if (ready !== sunReady) { sunReady = ready; setClass(sunEl, 'ready', ready); if (ready) toast(opts.touch ? 'SUNBURST READY' : 'SUNBURST READY · Q', 2.0, 'cool'); }
     }
     // --- the beacon prompt
     const pr = hudOn && !glanceOn ? promptInfo(state) : null;   // no pan prompt mid-frame during the kindle glance

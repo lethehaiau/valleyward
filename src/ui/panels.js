@@ -105,7 +105,8 @@ export function minigunOf(st) {
 
 /**
  * @param {{ root: HTMLElement, uiBase: string, h: Function, esc: (s: any) => string, fitText: (s: any) => string,
- *           emit: (a: string, d?: any) => void, sound: (s: string) => void, freePointer: () => void, now: () => number }} ctx
+ *           emit: (a: string, d?: any) => void, sound: (s: string) => void, freePointer: () => void, now: () => number,
+ *           touch?: boolean }} ctx
  */
 export function createPanels(ctx) {
   const { h, esc, fitText, emit, sound, now } = ctx;
@@ -127,6 +128,11 @@ export function createPanels(ctx) {
   });
   const body = h('div', 'ew-sbody', panel);
   const hintEl = h('div', 'ew-hint ew-shint', panel, '');
+  if (ctx.touch) {
+    const closeBtn = h('button', 'ew-touch-button ew-shop-close', panel, 'Close');
+    closeBtn.setAttribute('type', 'button');
+    closeBtn.addEventListener('click', () => close('click'));
+  }
 
   /** @type {null | { kind: 'npc'|'pad', pad: string, tab: 'up'|'ch', sel: number, sig: string, resolve: (v: any) => void, openedAt: number, rows: HTMLElement[], acts: (null | (() => void))[], confirm: string, confirmUntil: number }} */
   let S = null;
@@ -181,7 +187,9 @@ export function createPanels(ctx) {
           const short = gold < M.unlock, armed = S.confirm === 'minigun' && now() < S.confirmUntil;
           rows.push({ dis: short, icon: ICON.minigun, name: M.name, pips: '', cls: 'organ' + (armed ? ' armed' : ''),
             text: 'A six-barrel rotary gun · replaces the Blunderbuss in slot 2', right: `<span class="ew-scost${short ? ' short' : ''}"><i class="ew-coin"></i>${M.unlock.toLocaleString('en-US')}</span>`,
-            why: short ? `<span class="ew-sreason">NEED ${(M.unlock - gold).toLocaleString('en-US')} MORE</span>` : armed ? '<span class="ew-sreason warn">CONFIRM · PRESS AGAIN TO BUY</span>' : '<span class="ew-sreason ok">ENTER, THEN ENTER AGAIN TO CONFIRM</span>',
+            why: short ? `<span class="ew-sreason">NEED ${(M.unlock - gold).toLocaleString('en-US')} MORE</span>`
+              : armed ? '<span class="ew-sreason warn">CONFIRM · PRESS AGAIN TO BUY</span>'
+                : `<span class="ew-sreason ok">${ctx.touch ? 'TAP TWICE TO CONFIRM' : 'ENTER, THEN ENTER AGAIN TO CONFIRM'}</span>`,
             run: () => { if (S && S.confirm === 'minigun' && now() < S.confirmUntil) { S.confirm = ''; S.sig = ''; emit('buyOrgan', { act: 'buyOrgan' }); } else if (S) { S.confirm = 'minigun'; S.confirmUntil = now() + 3; S.sig = ''; } } });
         } else {
           const lv = mg.level, maxed = lv >= (M.max || 10), cost = maxed ? 0 : upgradeCost(M, lv), short = !maxed && gold < cost;
@@ -190,7 +198,7 @@ export function createPanels(ctx) {
             why: maxed ? '' : short ? `<span class="ew-sreason">NEED ${cost - gold} MORE</span>` : `<span class="ew-sreason ok">LV ${lv} → ${lv + 1}</span>`,
             run: () => emit('buy', { act: 'buy', item: ORGAN_ID }) });
           rows.push({ dis: false, icon: ICON.swap, name: 'Slot 2', pips: '', cls: 'swap',
-            text: `Carried: ${mg.equipped ? 'the Thunder Organ' : 'the Blunderbuss'} · both keep their upgrades`, why: `<span class="ew-sreason ok">ENTER TO CARRY THE ${mg.equipped ? 'BLUNDERBUSS' : 'THUNDER ORGAN'}</span>`,
+            text: `Carried: ${mg.equipped ? 'the Thunder Organ' : 'the Blunderbuss'} · both keep their upgrades`, why: `<span class="ew-sreason ok">${ctx.touch ? 'TAP' : 'ENTER'} TO CARRY THE ${mg.equipped ? 'BLUNDERBUSS' : 'THUNDER ORGAN'}</span>`,
             right: '<span class="ew-scost max">⇄</span>',
             run: () => emit('equipOrgan', { act: 'equipOrgan', on: !mg.equipped }) });
         }

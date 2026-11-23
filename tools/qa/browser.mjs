@@ -79,7 +79,7 @@ export function launch({ width = 1280, height = 720, uncapped = false, userDataD
  * bare "Failed to load resource"). warnings: console warnings.
  * @returns {Promise<{ page: any, errors: string[], warnings: string[] }>}
  */
-export async function openPage(browser, address) {
+export async function openPage(browser, address, configure = undefined) {
   const tab = await browser.newPage();
   const errors = [];
   const warnings = [];
@@ -97,6 +97,7 @@ export async function openPage(browser, address) {
   tab.on('response', (res) => {
     if (res.status() >= 400) errors.push(`http ${res.status()}: ${res.url()}`);
   });
+  await configure?.(tab);
   await tab.goto(address, { timeout: 90000, waitUntil: 'domcontentloaded' });
   return { page: tab, errors, warnings };
 }

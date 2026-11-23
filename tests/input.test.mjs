@@ -103,3 +103,13 @@ test('click and drag remain usable without the Pointer Lock API', (t) => {
   assert.equal(frame.edges.has('fire'), false);
   mouseUp();
 });
+
+test('compatibility mouse events from touch do not request desktop pointer lock', (t) => {
+  const { canvas } = setup(t);
+  let attempts = 0;
+  canvas.requestPointerLock = () => { attempts++; };
+  const input = createInput({ canvas });
+  canvas.dispatchEvent(Object.assign(new Event('mousedown'), { button: 0, sourceCapabilities: { firesTouchEvents: true } }));
+  assert.equal(attempts, 0);
+  assert.equal(input.poll().held.has('fire'), false);
+});

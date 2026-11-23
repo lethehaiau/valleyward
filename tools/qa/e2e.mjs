@@ -1,11 +1,12 @@
 // VALLEYWARD end to end, on a production build (vite build, then vite preview). Run it under the GPU lock:
-//   tools/gpu-lock.sh node tools/qa/e2e.mjs [--port 5358] [--seed 2] [--speed 4] [--only entry,probe,upgrades,views,night,v2,v3,v4,editions] [--no-build]
+//   tools/gpu-lock.sh node tools/qa/e2e.mjs [--port 5358] [--seed 2] [--speed 4] [--only entry,probe,upgrades,mobile,views,night,v2,v3,v4,editions] [--no-build]
 // One headless Chrome (tools/platform.mjs) and one preview server, both closed at the end. The stages, in order:
 //   entry     the title cover, a click, the intro, Space after 2 s skips it, play (the route a player takes)
 //   probe     the first seconds of input: W / A / S / D move within a frame or two and stop on release, a click fires,
 //             3 takes the Lance, G throws a firebomb, E at the pan kindles, P pauses (the sim clock holds) and resumes,
 //             the fire style switches live
 //   upgrades  mouse and keyboard card picks restore capture, consecutive offers stay visible, one denial can recover
+//   mobile    touch entry, multi-touch combat, input interruption, mobile menus, camp and ending
 //   views     m1 / m2 / top in the greybox (?look=greybox) and with every module, the HUD
 //   night     the self-play night (?autoplay=1&speed=4) to victory or a fall, captured at its key moments; the card → the camp
 //   v2        DESIGN §9: the camp (Brother Cinder's panel, a buy, a pad's panel, two towers built and one upgraded, the save
@@ -24,6 +25,7 @@ import path from 'node:path';
 import { startPreview, launch, openPage, waitFor, sleep, meanLuma, ROOT } from './browser.mjs';
 import { TIMELINE } from '../../src/shared/timeline.js';
 import { XP_NEXT } from '../../src/sim/constants.js';
+import { mobileStage } from './mobile.mjs';
 
 // ---- options -------------------------------------------------------------------------------------------------------
 const cli = process.argv.slice(2);
@@ -262,6 +264,7 @@ try {
   // ------------------------------------------------------------------------------------------ 2. the first seconds of input
   if (want('probe')) await probeStage();
   if (want('upgrades')) await upgradesStage();
+  if (want('mobile')) await mobileStage({ browser, base, seed: SEED, check, shot });
 
   // ------------------------------------------------------------------------------------------ 3. views
   for (const [name, q] of want('views') ? [['m1_greybox', 'look=greybox&view=m1'], ['m2_greybox', 'look=greybox&view=m2'], ['m1_full', 'view=m1'], ['m2_full', 'view=m2'], ['top_full', 'view=top']] : []) {

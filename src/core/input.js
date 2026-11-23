@@ -107,6 +107,7 @@ export function createInput(o) {
     if (action) down.delete(action);
   }
   function buttonDown(e) {
+    if (e.sourceCapabilities?.firesTouchEvents) return;
     userGesture(); canvas.focus?.({ preventScroll: true });
     if (!active) return;
     if (e.button === RIGHT) { pressed.add('bomb'); return; }   // RMB: a firebomb
@@ -122,7 +123,7 @@ export function createInput(o) {
     } : undefined);
   }
   function buttonUp(e) {
-    if (e.button !== LEFT) return;
+    if (e.button !== LEFT || e.sourceCapabilities?.firesTouchEvents) return;
     down.delete('fire');
     if (drag) drag.released = true;
     drag = null;
