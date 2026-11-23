@@ -17,6 +17,8 @@ import { setGfx } from './gfx/current.js';
 import { lanceOptions, pickedModules, rendererQuery } from './core/fire-registry.js';
 import { CARD_BY_ID } from './sim/cards.js';
 import { createInput, SENS } from './core/input.js';
+import { createTouch, createFullscreenControl, phoneTouches } from './core/touch.js';
+import './core/touch.css';
 import { createShake } from './core/shake.js';
 import { createFrameMetrics } from './core/frame-metrics.js';
 import { createFireMetrics } from './core/fire-metrics.js';
@@ -42,6 +44,10 @@ const MAX_DT = 0.1;              // s: a longer frame (a stall, a breakpoint) co
 const bootT0 = performance.now();
 const cover = document.getElementById('loading');
 const uiRoot = document.getElementById('ui') || document.body;
+const mobile = phoneTouches();
+const portrait = matchMedia('(orientation: portrait)');
+document.documentElement.classList.toggle('ew-touch', mobile);
+const addFullscreen = mobile ? createFullscreenControl() : null;
 if (P.noui) uiRoot.style.display = 'none';
 // The loading bar (index.html's #loading .ld-bar). Each boot step sets where the bar is and where the next step will
 // leave it; in between, the bar creeps toward that ceiling (never reaching it), so a long step such as the shader
@@ -130,8 +136,8 @@ let governor = createResolutionGovernor(ceilingDpr, governorTarget());
 
 // ---- everything the loop and the hooks share
 let ready = false, fireStyle = P.fire, titleUp = false;
-const hold = { menu: false, manual: false, modal: false };   // what pauses the sim: the menu, a tool, a UI modal
-const isPaused = () => hold.menu || hold.manual || hold.modal;
+const hold = { menu: false, manual: false, modal: false, portrait: false };
+const isPaused = () => hold.menu || hold.manual || hold.modal || hold.portrait;
 let override = null;   // __ew.setInput(): a tool's sim input instead of the player's
 let lastNow = performance.now(), raf = 0, acc = 0, wallT = 0, simMs = 0, opsN = 0, capFps = P.fps;
 let hitStopT = 0, endCard = null, dawnT = -1, lastHurt = 0, cineOwned = false, vmShown = true, introCardShown = false;
@@ -203,7 +209,7 @@ function uiTarget() {
   if (up.ui) return part.ui;
   if (!settled) return UI_STUB;
   fallbackHud ??= createFallbackUI({
-    root: uiRoot, menuSettings: fireMenuSettings(),
+    root: uiRoot, menuSettings: fireMenuSettings(), touch: mobile, addFullscreen,
     onAction: (a) => { if (a.startsWith('fire:')) setFireStyle(a.slice(5)); },
   });
   return fallbackHud;
@@ -225,10 +231,34 @@ const audioApi = facade('audio', () => (up.audio ? part.audio : SILENT));
 // ================================================================================================ input, pause, menus
 const focusCanvas = () => canvas.focus({ preventScroll: true });
 const input = createInput({ canvas, onGesture: () => audioApi.unlock(), onKey: gameKey });
-canvas.addEventListener('pointerdown', () => { trySkip(); });   // (a click skips the intro once it may be skipped)
+const touch = mobile && !P.noui ? createTouch({ canvas, root: uiRoot, pause: toggleMenu, unlock: () => audioApi.unlock() }) : null;
+canvas.addEventListener('pointerdown', () => { if (!hold.portrait) trySkip(); });
+
+function clearTouch() {
+  touch?.clear();
+  clearInputEdges();
+}
+function clearInputEdges() {
+  latched.edges.clear();
+  latched.wheel = 0;
+}
+
+if (mobile) {
+  const syncOrientation = () => {
+    hold.portrait = portrait.matches;
+    for (const element of [cover, uiRoot, canvas]) if (element) element.inert = hold.portrait;
+    if (hold.portrait) { clearTouch(); input.clear(); input.releaseLock(); }
+    updateTouch();
+    syncPause();
+  };
+  portrait.addEventListener('change', syncOrientation);
+  syncOrientation();
+  addEventListener('blur', clearTouch);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) clearTouch(); });
+}
 
 function gameKey(e) {
-  if (e.repeat) return;
+  if (e.repeat || hold.portrait) return;
   const code = e.code, mode = sim.state.mode;
   if (mode === 'intro' && (code === 'Space' || code === 'Enter' || code === 'KeyE')) {
     if (trySkip()) e.preventDefault();
@@ -259,12 +289,13 @@ function toggleMenu() {
   const menu = uiApi.menu;
   if (menu.isOpen) { menu.close('resume'); return; }
   hold.menu = true;
+  if (touch) clearTouch();
   input.releaseLock();
   syncPause();
   Promise.resolve(menu.open()).then((choice) => {
     hold.menu = false;
     syncPause();
-    menuChoice(choice);
+    if (!up.ui) menuChoice(choice);
     focusCanvas();
   });
 }
@@ -341,6 +372,7 @@ const viewmodelPair = () => { const vm = viewmodel(); return { scene: vm.scene, 
 function uiOptions() {
   return {
     root: uiRoot, noui: P.noui, assetsBase, fireStyle, cardDefs: CARD_BY_ID, menuSettings: fireMenuSettings(),
+    touch: mobile, addFullscreen,
     onAction(act, detail) {
       if (act === 'restart') { menuChoice(act); return; }
       if (!SIM_ACTS.has(act)) return;
@@ -415,6 +447,7 @@ function showUpgrade(ev) {
   const offer = st.mode === 'cards' && st.player.level === ev.level ? st.cards : null;
   const restoreLock = !!offer && input.releaseLock();
   if (offer) input.enabled = false;
+  if (offer && touch) clearTouch();
 
   function picked(id, event) {
     if (!offer || sim.state.cards !== offer || !sim.pickCard(id)) return;
@@ -514,7 +547,8 @@ function playerInput(frameIn, first) {
   const axis = (plus, minus) => (held.has(plus) ? 1 : 0) - (held.has(minus) ? 1 : 0);
   const once = (action) => !!edge?.has(action);
   const out = {
-    fwd: axis('up', 'down'), right: axis('right', 'left'), sprint: held.has('sprint'), yaw: rig.look.yaw, pitch: rig.look.pitch,
+    fwd: axis('up', 'down') || frameIn.moveY || 0, right: axis('right', 'left') || frameIn.moveX || 0,
+    sprint: held.has('sprint'), yaw: rig.look.yaw, pitch: rig.look.pitch,
     fire: held.has('fire'), firePress: once('fire'), jump: once('jump'), bomb: once('bomb'), reload: once('reload'),
     kindle: once('kindle'), ult: once('ult'), weapon: 0, wheel: first ? frameIn.wheel : 0, card: 0,
   };
@@ -561,6 +595,20 @@ function lookIsFree() {
   const st = sim.state;
   return st.mode === 'play' || (st.mode === 'camp' && !st.camp.panel);
 }
+function updateTouch() {
+  if (!touch) return;
+  const st = sim.state, p = st.player, pan = ARENA.beacon.pan;
+  const camp = st.mode === 'camp';
+  const allowed = ready && !isPaused() && !uiApi.modal && lookIsFree() && rig.view === 'play'
+    && (!camp || st.modeT >= TIMELINE.camp.hold) && !botOn && !override && !document.hidden;
+  const interact = camp ? !!st.camp.near && st.t - (st.camp.closedAt ?? -9) >= 0.3
+    : st.mode === 'play' && st.night.kindleCd <= 0 && !(st.night.kindleLockT > 0)
+      && Math.hypot(p.x - pan.x, p.y - pan.y, p.z - pan.z) <= ARENA.beacon.useRadius;
+  const deactivated = touch.update(st.mode, allowed, {
+    interact, reload: p.weapon !== 'lance', bombs: p.bombs > 0, sunburst: p.sunburst >= 1,
+  });
+  if (deactivated) clearInputEdges();
+}
 /** A UI modal over play or a result card holds the sim and frees the pointer. */
 function syncUiModal() {
   const mode = sim.state.mode;
@@ -572,11 +620,12 @@ function syncUiModal() {
 }
 /** This frame's input, with the presses latched until a sim step reads them (a frame without a step loses none). */
 function gatherInput(paused) {
-  const polled = input.poll();
-  if (paused) { latched.edges.clear(); latched.wheel = 0; }
+  const desktop = input.poll();
+  const polled = touch ? touch.merge(desktop) : desktop;
+  if (paused) clearInputEdges();
   for (const e of polled.edges) latched.edges.add(e);
   latched.wheel += polled.wheel;
-  return { held: polled.held, edges: latched.edges, lookX: polled.lookX, lookY: polled.lookY, wheel: latched.wheel };
+  return { ...polled, edges: latched.edges, wheel: latched.wheel };
 }
 /** The fixed-step sim: game time = dt × ?speed × the sim's time scale, in DT steps; hit-stop holds it. */
 function advance(dt, paused, frameIn) {
@@ -755,6 +804,7 @@ function frame(now) {
     safe('look', 'setViewmodel', (l) => l.setViewmodel(hands ? viewmodelPair() : null));
   }
   timed('ui', () => uiApi.update(S));
+  updateTouch();
   safe('look', 'setHurt', (l) => l.setHurt(S.mode === 'play' ? hurtLevel(S) : 0));
 
   // ---- render: the look (it runs the fire pass and draws the viewmodel), else the plain path
@@ -1028,28 +1078,32 @@ function begin() {
   if (sim.state.mode !== 'title') return;
   if (sim.hadSave) sim.toCamp('start'); else sim.startIntro();
 }
+const titleHint = mobile ? 'TAP TO BEGIN' : 'CLICK TO BEGIN';
 const TITLE_HTML = '<div style="text-align:center"><div>VALLEYWARD</div>'
-  + '<div style="font-size:12px;letter-spacing:.25em;margin-top:18px;opacity:.75">CLICK TO BEGIN</div></div>';
+  + `<div style="font-size:12px;letter-spacing:.25em;margin-top:18px;opacity:.75">${titleHint}</div></div>`;
 /** The loading cover becomes the title: its click (or a key) is the gesture that unlocks the audio and the pointer. */
 function showTitle() {
   titleUp = true;
+  const startEvent = mobile ? 'click' : 'pointerdown';   // a completed tap grants user activation for audio
   if (cover) {
     cover.innerHTML = TITLE_HTML;
     cover.style.cursor = 'var(--ew-cursor-action, pointer)';
-    try { uiApi.titleCover?.(cover); } catch (e) { console.warn('[ew] ui.titleCover', e); }
+    try { uiApi.titleCover?.(cover, titleHint); } catch (e) { console.warn('[ew] ui.titleCover', e); }
+    addFullscreen?.(cover, 'ew-touch-button ew-title-fullscreen');
   }
   const go = (e) => {
+    if (hold.portrait) return;
     if (e?.type === 'keydown' && (e.code === 'Escape' || e.repeat)) return;
-    // the title's links (the source, the fire-module guide) open in a new tab and do not start the game
-    if (e?.target?.closest?.('a')) return;
-    if (e?.type === 'keydown' && (e.code === 'Enter' || e.code === 'Space') && document.activeElement?.closest?.('#loading a')) return;
+    // Links and the fullscreen button handle their own activation.
+    if (e?.target?.closest?.('a,button')) return;
+    if (e?.type === 'keydown' && (e.code === 'Enter' || e.code === 'Space') && document.activeElement?.closest?.('#loading a,#loading button')) return;
     removeEventListener('keydown', go, true);
-    cover?.removeEventListener('pointerdown', go);
+    cover?.removeEventListener(startEvent, go);
     begin();
     focusCanvas();
   };
   addEventListener('keydown', go, true);
-  cover?.addEventListener('pointerdown', go);
+  cover?.addEventListener(startEvent, go);
 }
 /** The URL's start state, else the title. */
 function start() {

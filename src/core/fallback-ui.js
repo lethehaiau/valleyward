@@ -61,7 +61,7 @@ function meter(kind, style = '') {
 const group = (className, ...kids) => { const g = make('div', className); g.append(...kids); return g; };
 const fill = (bar, f) => { bar.firstChild.style.transform = `scaleX(${f})`; };
 
-export function createFallbackUI({ root, onAction, menuSettings = [] } = {}) {
+export function createFallbackUI({ root, onAction, menuSettings = [], touch = false, addFullscreen = null } = {}) {
   if (!document.getElementById(STYLE_ID)) {
     const tag = make('style');
     tag.id = STYLE_ID;
@@ -168,7 +168,7 @@ export function createFallbackUI({ root, onAction, menuSettings = [] } = {}) {
     get isOpen() { return menuShown; },
   };
   function renderMenu() {
-    const help = make('p', 'ctl', CONTROLS);
+    const help = make('p', 'ctl', touch ? 'Left stick to move · Swipe to look · Hold and drag Fire · Tap Pause for the menu' : CONTROLS);
     help.style.display = 'none';
     // (the fire entry reads just "Fire style": the current style is not part of its label)
     const entries = [['resume', 'Resume'], ['restart', 'Restart night'], ['fire', 'Fire style'], ['controls', 'Controls']];
@@ -186,6 +186,7 @@ export function createFallbackUI({ root, onAction, menuSettings = [] } = {}) {
       list.appendChild(button);
     }
     menuEl.replaceChildren(make('h1', '', 'VALLEYWARD'), list);
+    addFullscreen?.(list, 'ew-touch-button');
     if (settings.length) {
       menuEl.append(group('', ...settings.map(({ label }) => label)));
       if (settings.some(({ refresh }) => refresh)) menuEl.append(make('p', '', 'Module changes reload the game.'));
