@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { checkInfo, API_VERSION } from 'firewraith/api';
 import { info as classicInfo } from 'firewraith/modules/classic/info';
 import { info as classicGpuInfo } from 'firewraith/modules/classic-webgpu/info';
-import { REGISTRY, fallbackFor, pickedModules, isDevUrl, isLoadable } from '../src/fire/registry.js';
+import { REGISTRY, fallbackFor, pickedModules, isDevUrl, isLoadable, rendererQuery } from '../src/core/fire-registry.js';
 import { MODULES } from 'firewraith/modules';
 import { makeWorld } from '../src/fire/world.js';
 import { pickEdition } from '../src/gfx/index.js';
@@ -52,6 +52,23 @@ test('only listed ids and localhost URLs load', () => {
   assert.ok(isLoadable('classic') && isLoadable('classic-webgpu') && !isLoadable('toString') && !isLoadable('nope'));
 });
 
+test('renderer changes preserve unrelated settings and drop incompatible module requests', () => {
+  const original = Q('?gpu=webgl2&firemod=classic&lance=http://127.0.0.1/lance.js&seed=14&fire=smooth');
+  const next = rendererQuery(original, 'webgpu');
+  assert.equal(next.get('gpu'), 'webgpu');
+  assert.equal(next.get('seed'), '14');
+  assert.equal(next.get('fire'), 'smooth');
+  assert.ok(!next.has('firemod') && !next.has('ground') && !next.has('lance'));
+  assert.deepEqual(pickedModules(next, 'webgpu'), { lance: 'classic-webgpu', ground: 'classic-webgpu' });
+  assert.equal(original.get('gpu'), 'webgl2');
+});
+
+test('renderer changes retain explicitly compatible module picks per slot', () => {
+  const next = rendererQuery(Q('?firemod=classic-webgpu&lance=classic'), 'webgpu');
+  assert.equal(next.get('ground'), 'classic-webgpu');
+  assert.ok(!next.has('lance') && !next.has('firemod'));
+});
+
 test('the edition: ?gpu= wins, then the modules\' backend, else webgl2; no WebGPU → webgl2', () => {
   assert.equal(pickEdition(Q(''), { hasWebGPU: true }).edition, 'webgl2');
   assert.equal(pickEdition(Q('?gpu=webgpu'), { hasWebGPU: true }).edition, 'webgpu');
@@ -83,7 +100,7 @@ test('no game file imports the fire module code directly (only the host, through
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(`${d}/${e.name}`) : e.name.endsWith('.js') ? [`${d}/${e.name}`] : []));
   for (const f of walk('src')) {
     const s = fs.readFileSync(f, 'utf8');
-    if (f === 'src/fire/registry.js') continue;
+    if (f === 'src/core/fire-registry.js') continue;
     assert.doesNotMatch(s, /(^\s*import [^;]*|import\()['"]firewraith\/modules\//m, `${f} imports a fire module`);
     assert.doesNotMatch(s, /from '\.\.?\/(\.\.\/)*fluid\//, `${f} imports the old src/fluid`);
   }

@@ -24,7 +24,7 @@ edition: `docs/decisions/0001-fire-modules-and-two-editions.md`.
 - **Two slots:** `lance` (the Ember Lance's airborne flame) and `ground` (the fire on the ground: fire, smoke, embers,
   steam, and the light it casts). One module may fill both.
 - **Picking:** `?lance=<id|url>`, `?ground=<id|url>`, or `?firemod=` for both. An id must be listed in
-  `src/fire/registry.js` (today `classic` and `classic-webgpu`); for development, a module URL on this machine
+  `src/core/fire-registry.js` (today `classic` and `classic-webgpu`); for development, a module URL on this machine
   (`http://localhost:…`, `127.0.0.1` or `[::1]`) also works. Without a pick each edition uses its reference module.
 - **The edition follows the module.** A listed WebGPU module boots the WebGPU edition; `?gpu=webgl2|webgpu` forces one.
   A module given by URL shows its backend only once it loads, after the edition is chosen, so a WebGPU module served

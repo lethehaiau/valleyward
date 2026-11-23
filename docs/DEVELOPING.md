@@ -43,7 +43,12 @@ used here, v0.2.0: [10.5281/zenodo.24364837](https://doi.org/10.5281/zenodo.2436
 - **A `ground` module may decide what burns,** through its gameplay grid. Without one, the deterministic CPU fire grid
   (`src/sim/fireproxy.js`) decides.
 - **Two shading layers.** The game has `src/gfx/webgl2` and `src/gfx/webgpu`, and boots the one that matches the
-  picked modules' backend. `?gpu=webgl2|webgpu` forces one.
+  picked modules' backend. `?gpu=webgl2|webgpu` forces one. The **Renderer** toggle in the **P** menu asks for
+  confirmation before reloading the game and keeps compatible slot selections. WebGPU is disabled when the browser lacks its API.
+- **Local catalog.** The dev server reads `dev/catalog.json` from the linked Firewraith checkout on startup. Its
+  modules work by short ID, and **Lance module** in the **P** menu lists the current renderer's choices when local
+  Lance modules are available. Selecting one reloads with `?lance=<id>`. For a local startup default, run
+  `VALLEYWARD_DEV_LANCE=lance-curved-volume npm run dev` from Valleyward. Explicit URL choices take precedence.
 - **The WebGPU edition is complete** (`docs/WEBGPU-PORT.md`). It runs three's `WebGPURenderer` with the world, the look,
   the actors, the fx and Firewraith's `classic-webgpu` fire, which is its default and fallback module. Its frame time
   isn't measured yet. If something looks off, compare it with the WebGL2 edition.

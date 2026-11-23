@@ -14,6 +14,7 @@ import { TIMELINE } from './shared/timeline.js';
 import { ARENA } from './shared/arena.js';
 import { pickEdition, loadGfx } from './gfx/index.js';
 import { setGfx } from './gfx/current.js';
+import { devLanceOptions, pickedModules, rendererQuery } from './core/fire-registry.js';
 import { CARD_BY_ID } from './sim/cards.js';
 import { createInput, SENS } from './core/input.js';
 import { createShake } from './core/shake.js';
@@ -199,7 +200,10 @@ const SILENT = Object.fromEntries(AUDIO_CALLS.map((k) => [k, () => {}]));   // n
 function uiTarget() {
   if (up.ui) return part.ui;
   if (!settled) return UI_STUB;
-  fallbackHud ??= createFallbackUI({ root: uiRoot, onAction: (a) => { if (a.startsWith('fire:')) setFireStyle(a.slice(5)); } });
+  fallbackHud ??= createFallbackUI({
+    root: uiRoot, menuSettings: fireMenuSettings(),
+    onAction: (a) => { if (a.startsWith('fire:')) setFireStyle(a.slice(5)); },
+  });
   return fallbackHud;
 }
 /** One stable object for whichever implementation is current; a live part's methods run under safe(). */
@@ -274,6 +278,43 @@ function setFireStyle(s) {
   return fireStyle;
 }
 
+function reloadFireSettings(next) {
+  const url = new URL(location.href);
+  next.set('fire', fireStyle);
+  url.search = next.toString();
+  location.assign(url.href);
+}
+
+/** @returns {import('./core/menu-select.js').MenuSetting[]} */
+function fireMenuSettings() {
+  const webgpu = !!globalThis.navigator?.gpu;
+  const usingGpuFallback = gfx.edition === 'webgpu' && !renderer.backend?.isWebGPUBackend;
+  const settings = [{
+    id: 'renderer', label: 'Renderer',
+    selected: () => gfx.edition,
+    choices: [
+      { id: 'webgl2', label: 'WebGL2' },
+      { id: 'webgpu', label: 'WebGPU', disabled: !webgpu,
+        description: !webgpu ? 'Unavailable in this browser' : usingGpuFallback ? 'WebGL2 fallback active' : undefined },
+    ],
+    choose: (id) => reloadFireSettings(rendererQuery(query, id)),
+  }];
+  const lances = devLanceOptions(gfx.edition);
+  if (lances.length) {
+    settings.push({
+      id: 'lance', label: 'Lance module',
+      selected: () => call('fire', 'report')?.lance?.id ?? pickedModules(query, gfx.edition).lance,
+      choices: lances.map(({ id, name }) => ({ id, label: name })),
+      choose(id) {
+        const next = new URLSearchParams(query);
+        next.set('lance', id);
+        reloadFireSettings(next);
+      },
+    });
+  }
+  return settings;
+}
+
 // ================================================================================================ the cinema, with its stand-in
 const fallbackCinema = createFallbackCinema({ camera });
 const cinemaApi = {
@@ -297,7 +338,7 @@ const viewmodelPair = () => { const vm = viewmodel(); return { scene: vm.scene, 
 
 function uiOptions() {
   return {
-    root: uiRoot, noui: P.noui, assetsBase, fireStyle, cardDefs: CARD_BY_ID,
+    root: uiRoot, noui: P.noui, assetsBase, fireStyle, cardDefs: CARD_BY_ID, menuSettings: fireMenuSettings(),
     onAction(act, detail) {
       if (act === 'restart') { menuChoice(act); return; }
       if (!SIM_ACTS.has(act)) return;

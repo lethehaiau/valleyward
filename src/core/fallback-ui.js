@@ -3,6 +3,7 @@
 // beacon prompt, the level-up cards, the dawn / fallen cards, the P menu and the controls line.
 import { ARENA } from '../shared/arena.js';
 import { CARD_BY_ID } from '../sim/cards.js';
+import { createMenuSelect, createMenuToggle } from './menu-select.js';
 
 const STYLE_ID = 'ewf-style';
 /** [selector under .ewf, declarations]: kept in this order (later rules win ties) */
@@ -25,6 +26,10 @@ const RULES = [
   [' .cards button', 'width:190px;min-height:110px;text-align:left'],
   [' button', 'pointer-events:auto;font:inherit;color:#eef6f7;background:#16313d;border:1px solid #9ee1e9;padding:10px 16px;cursor:var(--ew-cursor-action,pointer)'],
   [' button:hover', 'background:#21495a'],
+  [' .setting', 'display:inline-flex;gap:.5em;align-items:center;margin:0 .4em'],
+  [' .setting select', 'font:inherit;color:#eef6f7;background:#16313d;border:1px solid #9ee1e9;padding:8px;color-scheme:dark'],
+  [' .setting button[aria-pressed="true"]', 'background:#a4e6ee;color:#0a1115'],
+  [' .setting button:disabled', 'opacity:.55;cursor:default'],
   [' .hud', 'transition:opacity .3s'],
   ['.nohud .hud', 'opacity:0'],
 ];
@@ -56,7 +61,7 @@ function meter(kind, style = '') {
 const group = (className, ...kids) => { const g = make('div', className); g.append(...kids); return g; };
 const fill = (bar, f) => { bar.firstChild.style.transform = `scaleX(${f})`; };
 
-export function createFallbackUI({ root, onAction } = {}) {
+export function createFallbackUI({ root, onAction, menuSettings = [] } = {}) {
   if (!document.getElementById(STYLE_ID)) {
     const tag = make('style');
     tag.id = STYLE_ID;
@@ -130,10 +135,23 @@ export function createFallbackUI({ root, onAction } = {}) {
   // ---- the P menu
   let menuShown = false, menuDone = null, style = 'smooth';
   const menuEl = make('div', 'card');
+  const settings = menuSettings.map((setting) => {
+    if (setting.id === 'renderer') {
+      const toggle = createMenuToggle(setting, ({ id, label }) => {
+        if (window.confirm(`Switch to ${label}? The game will reload.`)) setting.choose(id);
+      });
+      return { label: group('setting', make('span', '', setting.label), toggle) };
+    }
+    const control = createMenuSelect(setting);
+    const label = make('label', 'setting', setting.label);
+    label.append(control.select);
+    return { label, refresh: control.refresh };
+  });
   menuEl.style.display = 'none';
   shell.appendChild(menuEl);
   const menu = {
     open() {
+      for (const setting of settings) setting.refresh?.();
       menuShown = true;
       menuEl.style.display = '';
       try { document.exitPointerLock?.(); } catch { /* not locked */ }
@@ -167,7 +185,12 @@ export function createFallbackUI({ root, onAction } = {}) {
       };
       list.appendChild(button);
     }
-    menuEl.replaceChildren(make('h1', '', 'VALLEYWARD'), list, help);
+    menuEl.replaceChildren(make('h1', '', 'VALLEYWARD'), list);
+    if (settings.length) {
+      menuEl.append(group('', ...settings.map(({ label }) => label)));
+      if (settings.some(({ refresh }) => refresh)) menuEl.append(make('p', '', 'Module changes reload the game.'));
+    }
+    menuEl.append(help);
   }
   renderMenu();
 

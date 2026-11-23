@@ -5,7 +5,7 @@
 // the assets) is shared. The page boots ONE edition: ?gpu=webgl2|webgpu, else the backend of the fire modules picked
 // (?lance= / ?ground= / ?firemod=), else webgl2; without WebGPU in the browser it is webgl2 (the reason is reported).
 // A module whose shaders are not yet in an edition's layer is off in that edition, and the greybox stands in for it.
-import { REGISTRY, pickedModules } from '../fire/registry.js';
+import { DEV_LANCE, REGISTRY, requestedModules } from '../core/fire-registry.js';
 
 export const EDITIONS = Object.freeze(['webgl2', 'webgpu']);
 
@@ -15,10 +15,14 @@ export function pickEdition(q, env = { hasWebGPU: typeof navigator !== 'undefine
   const forced = q.get('gpu');
   if (forced && EDITIONS.includes(forced)) { want = forced; why = `?gpu=${forced}`; }
   else {
-    const picks = pickedModules(q);
+    const picks = requestedModules(q);
     for (const slot of ['ground', 'lance']) {
       const r = REGISTRY[picks[slot]];
       if (r && r.backend === 'webgpu') { want = 'webgpu'; why = `the ${slot} module "${picks[slot]}" is a webgpu module`; break; }
+    }
+    if (!picks.lance && !picks.ground && DEV_LANCE) {
+      want = REGISTRY[DEV_LANCE].backend;
+      why = `the dev Lance default "${DEV_LANCE}"`;
     }
   }
   if (want === 'webgpu' && !env.hasWebGPU) return { edition: 'webgl2', why: `${why}, but this browser has no WebGPU: the webgl2 edition`, downgraded: true };

@@ -55,6 +55,8 @@
   </tr>
 </table>
 
+Press **P**, choose WebGL2 or WebGPU under **Renderer**, then confirm to reload with that renderer.
+
 ## Bring your own fire
 
 VALLEYWARD is a playground for **real-time volumetric fire in the browser**. The challenge: fire that looks alive,

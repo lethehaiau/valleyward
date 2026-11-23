@@ -15,6 +15,7 @@ import { buildCssV2 } from './style2.js';
 import { cardDef, SKILL_CARDS, skillBase } from './cards.js';
 import { createPanels, saveOf, runGold, towersOf, towerName, padOf, CINDER_LINES, iconCss, ICON, towerMax, minigunDef, minigunOf } from './panels.js';
 import { NIGHTS, NIGHTS_PLANNED, CHARMS, TOWERS, UPGRADES, upgradeCost } from '../shared/meta.js';
+import { createMenuSelect, createMenuToggle } from '../core/menu-select.js';
 
 const STYLE_ID = 'ew-ui-style';
 const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000;
@@ -111,6 +112,7 @@ const CONTROLS = [
 /**
  * @param {{ root?: HTMLElement|null, assetsBase?: string, noui?: boolean, keys?: boolean,
  *           fireStyle?: 'smooth'|'hybrid', cardDefs?: Record<string, any>,
+ *           menuSettings?: import('../core/menu-select.js').MenuSetting[],
  *           onAction?: (a: string, detail?: any) => void, onFireStyle?: (s: 'smooth'|'hybrid') => void }} [opts]
  */
 export function createUI(opts = {}) {
@@ -255,13 +257,64 @@ export function createUI(opts = {}) {
   h('div', 'ew-pkick', menuPanel, 'VALLEYWARD');
   h('div', 'ew-ptitle ew-ts', menuPanel, 'PAUSED');
   const menuItems = h('div', 'ew-items', menuPanel);
-  const MENU = [['resume', 'RESUME'], ['restart', 'RESTART NIGHT'], ['style', 'FIRE STYLE'], ['controls', 'CONTROLS']];
-  const menuBtns = MENU.map(([id, label]) => {
+  /** @type {Map<string, ReturnType<typeof createMenuSelect>>} */
+  const menuSelects = new Map();
+  const menuBtns = [['resume', 'RESUME'], ['restart', 'RESTART NIGHT'], ['style', 'FIRE STYLE']].map(([id, label]) => {
     const b = /** @type {HTMLButtonElement} */ (h('button', 'ew-item ew-ts', menuItems, label));
     b.type = 'button'; b.dataset.act = id; b.dataset.label = label; return b;
   });
   const restartBtn = menuBtns[1], styleBtn = menuBtns[2];
   const styleTog = h('span', 'ew-style', styleBtn, '<span data-s="smooth">SMOOTH</span><span data-s="hybrid">HYBRID</span>');
+  /** @type {HTMLElement[]} */
+  const menuRows = [...menuBtns];
+  const rendererSetting = opts.menuSettings?.find(({ id }) => id === 'renderer');
+  const rendererDialog = rendererSetting ? /** @type {HTMLDialogElement} */ (h('dialog', 'ew-panel ew-renderer-dialog', menuEl)) : null;
+  if (rendererDialog) h('h2', 'ew-ptitle ew-ts', rendererDialog, 'SWITCH RENDERER?');
+  const rendererPrompt = rendererDialog ? h('p', 'ew-body', rendererDialog) : null;
+  if (rendererDialog && rendererSetting) {
+    rendererDialog.setAttribute('aria-label', 'Switch renderer?');
+    const actions = h('form', 'ew-renderer-actions', rendererDialog,
+      '<button type="submit" class="ew-btn ew-ts" value="cancel" autofocus>Cancel</button><button type="submit" class="ew-btn ew-ts" value="switch">Switch</button>');
+    actions.setAttribute('method', 'dialog');
+    actions.addEventListener('submit', (e) => {
+      const button = /** @type {HTMLButtonElement|null} */ (/** @type {SubmitEvent} */ (e).submitter);
+      if (button?.value === 'switch') rendererSetting.choose(rendererDialog.dataset.renderer ?? '');
+    });
+  }
+
+  /** @param {import('../core/menu-select.js').MenuChoice | undefined} choice */
+  function confirmRenderer(choice) {
+    if (!rendererDialog || !rendererPrompt || !choice || choice.disabled || choice.id === rendererSetting?.selected()) return;
+    rendererDialog.dataset.renderer = choice.id;
+    rendererPrompt.textContent = `The game will reload to switch to ${choice.label}.`;
+    rendererDialog.setAttribute('aria-description', rendererPrompt.textContent);
+    rendererDialog.showModal();
+  }
+
+  for (const setting of opts.menuSettings ?? []) {
+    if (setting === rendererSetting) {
+      const row = h('div', 'ew-item ew-ts', menuItems, 'RENDERER');
+      row.dataset.act = setting.id;
+      const toggle = createMenuToggle(setting, confirmRenderer);
+      toggle.className = 'ew-style ew-renderer-options';
+      row.append(toggle);
+      menuRows.push(row);
+      continue;
+    }
+    const row = h('label', 'ew-item ew-menu-setting ew-ts', menuItems);
+    row.dataset.act = setting.id;
+    const name = h('span', '', row);
+    name.textContent = setting.label;
+    const control = createMenuSelect(setting);
+    row.append(control.select);
+    menuRows.push(row);
+    menuSelects.set(setting.id, control);
+  }
+  const controlsBtn = /** @type {HTMLButtonElement} */ (h('button', 'ew-item ew-ts', menuItems, 'CONTROLS'));
+  controlsBtn.type = 'button';
+  controlsBtn.dataset.act = 'controls';
+  menuRows.push(controlsBtn);
+  if (menuSelects.size) h('div', 'ew-hint ew-reload-hint', menuPanel, 'Module changes reload the game.');
   h('div', 'ew-hint', menuPanel, 'P or Esc to resume');
   h('div', 'ew-menulinks', menuPanel, outLink(LINKS.repo, `${GH_MARK}<span>SOURCE ON GITHUB</span>`) + outLink(LINKS.fire, '<span>BUILD YOUR OWN FIRE</span>'));
 
@@ -406,22 +459,36 @@ export function createUI(opts = {}) {
   }
 
   // ------------------------------------------------------------------------------------------------ menu + controls
-  function paintMenu() { menuBtns.forEach((b, i) => setClass(b, 'sel', i === menuSel)); }
+  function paintMenu() { menuRows.forEach((b, i) => setClass(b, 'sel', i === menuSel)); }
   function armRestart(on) {
     restartArmedUntil = on ? now() + 3 : 0;
     restartBtn.textContent = on ? 'RESTART? PRESS AGAIN' : /** @type {string} */ (restartBtn.dataset.label);
     setClass(restartBtn, 'confirm', on);
   }
   function menuAct(act) {
+    const setting = menuSelects.get(act);
+    if (setting) {
+      setting.select.focus();
+      try { setting.select.showPicker?.(); } catch { /* keyboard can operate the focused select */ }
+      return;
+    }
     if (act === 'restart' && !(restartArmedUntil > now())) { armRestart(true); sound('move'); return; }
     if (act === 'style') { chooseStyle(fireStyle === 'smooth' ? 'hybrid' : 'smooth'); return; }
+    if (act === 'renderer') {
+      confirmRenderer(rendererSetting?.choices.find(({ id }) => id !== rendererSetting.selected()));
+      return;
+    }
     sound(act === 'resume' ? 'back' : 'select');
     if (act === 'controls') { controls.open(); return; }
     menu.close(act);
   }
   menuEl.addEventListener('mousemove', (e) => { if (Math.abs(e.movementX) + Math.abs(e.movementY) > 0) hoverArmed = true; });
-  menuBtns.forEach((b, i) => {
+  menuRows.forEach((b, i) => {
     b.addEventListener('mousemove', () => { if (!hoverArmed || menuSel === i) return; menuSel = i; paintMenu(); sound('move'); });
+    if (b.dataset.act === 'renderer' || menuSelects.has(b.dataset.act ?? '')) {
+      b.addEventListener('focusin', () => { menuSel = i; paintMenu(); });
+      return;
+    }
     b.addEventListener('click', (e) => {
       e.stopPropagation(); menuSel = i; paintMenu();
       const t = /** @type {HTMLElement} */ (e.target);
@@ -435,6 +502,7 @@ export function createUI(opts = {}) {
     open() {
       if (menuOpen) return new Promise((r) => { const prev = menuResolve; menuResolve = (v) => { prev?.(v); r(v); }; });
       if (cardsState || endState) return Promise.resolve('resume');
+      for (const setting of menuSelects.values()) setting.refresh();
       menuOpen = true; menuSel = 0; hoverArmed = false; armRestart(false); paintMenu(); freePointer();
       setClass(menuEl, 'on', true);
       emit('menu-open'); sound('open');
@@ -442,6 +510,7 @@ export function createUI(opts = {}) {
     },
     close(result = 'resume') {
       if (!menuOpen) return;
+      if (rendererDialog?.open) rendererDialog.close();
       if (ctlOpen) controls.close();
       menuOpen = false; armRestart(false);
       setClass(menuEl, 'on', false);
@@ -688,6 +757,7 @@ export function createUI(opts = {}) {
   // ------------------------------------------------------------------------------------------------ keys
   function onKey(e) {
     const k = e.code || e.key;
+    if (rendererDialog?.open) { e.stopPropagation(); return; }
     if (panels.isOpen && !(endState && !endState.done) && !(cardsState && !cardsState.done) && panels.onKey(e)) return;
     if (cardsState && !cardsState.done) {
       const n = k === 'Digit1' || k === 'Numpad1' ? 0 : k === 'Digit2' || k === 'Numpad2' ? 1 : k === 'Digit3' || k === 'Numpad3' ? 2 : -1;
@@ -719,12 +789,28 @@ export function createUI(opts = {}) {
       return;
     }
     if (menuOpen) {
+      const nativeSelect = e.target instanceof HTMLSelectElement ? e.target : null;
+      if (nativeSelect && /^(Arrow|Home$|End$|Page|Enter$|Space$|NumpadEnter$)/.test(k)) return;
+      const rendererButton = e.target instanceof HTMLButtonElement && e.target.closest('.ew-renderer-options') ? e.target : null;
       const up = k === 'ArrowUp' || k === 'KeyW', down = k === 'ArrowDown' || k === 'KeyS' || k === 'Tab';
-      if (up || down) { e.preventDefault(); e.stopPropagation(); menuSel = (menuSel + (up ? -1 : 1) + menuBtns.length) % menuBtns.length; paintMenu(); sound('move'); return; }
-      if ((k === 'ArrowLeft' || k === 'ArrowRight' || k === 'KeyA' || k === 'KeyD') && menuSel === 2) {
-        e.preventDefault(); e.stopPropagation(); chooseStyle(k === 'ArrowLeft' || k === 'KeyA' ? 'smooth' : 'hybrid'); return;
+      if (up || down) {
+        e.preventDefault(); e.stopPropagation(); (nativeSelect ?? rendererButton)?.blur();
+        const move = up || (k === 'Tab' && e.shiftKey) ? -1 : 1;
+        menuSel = (menuSel + move + menuRows.length) % menuRows.length; paintMenu(); sound('move'); return;
       }
-      if (k === 'Enter' || k === 'NumpadEnter' || k === 'Space') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) menuAct(/** @type {string} */ (menuBtns[menuSel].dataset.act)); return; }
+      const action = menuRows[menuSel].dataset.act ?? '';
+      if ((k === 'ArrowLeft' || k === 'ArrowRight' || k === 'KeyA' || k === 'KeyD') && (action === 'style' || action === 'renderer')) {
+        e.preventDefault(); e.stopPropagation();
+        const left = k === 'ArrowLeft' || k === 'KeyA';
+        if (action === 'style') chooseStyle(left ? 'smooth' : 'hybrid');
+        else confirmRenderer(rendererSetting?.choices[left ? 0 : 1]);
+        return;
+      }
+      if (k === 'Enter' || k === 'NumpadEnter' || k === 'Space') {
+        e.preventDefault(); e.stopPropagation();
+        if (!e.repeat) { if (rendererButton) rendererButton.click(); else menuAct(action); }
+        return;
+      }
       if ((k === 'KeyP' && listenKeys) || k === 'Escape') { e.preventDefault(); e.stopPropagation(); menu.close('resume'); return; }
       if (k === 'KeyH' && listenKeys) { e.preventDefault(); e.stopPropagation(); controls.open(); return; }
       if (k !== 'Escape') e.stopPropagation();

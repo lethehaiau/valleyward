@@ -15,7 +15,7 @@ import * as THREE from 'three';
 import { checkInfo, checkModule, API_VERSION } from 'firewraith/api';
 import { FIRELIGHT } from '../shared/firelight.js';
 import { makeWorld } from './world.js';
-import { REGISTRY, fallbackFor, loadModule, pickedModules } from './registry.js';
+import { REGISTRY, fallbackFor, loadModule, pickedModules } from '../core/fire-registry.js';
 
 const SLOT_ORDER = ['ground', 'lance'];   // render order: the ground fire first, the airborne flame over it
 
@@ -172,7 +172,10 @@ export async function createFire({ renderer, edition = 'webgl2', quality = 'high
       const g = ground();
       let st = {};
       try { st = g?.mod.stats?.() || {}; } catch (e) { if (g) failed(g, 'stats', e); }
-      return { ...st, style: st.style ?? S.style, modules: api.report() };
+      const l = insts.find((i) => i !== g && i.slots.includes('lance'));
+      let lance;
+      try { lance = l?.mod.stats?.(); } catch (e) { if (l) failed(l, 'stats', e); }
+      return { ...st, ...(lance && { lance }), style: st.style ?? S.style, modules: api.report() };
     },
     /** Does a module fill this slot? @param {'lance'|'ground'} slot */
     has(slot) { return insts.some((i) => i.slots.includes(slot)); },

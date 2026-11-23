@@ -218,9 +218,23 @@ export function buildCss(fontsUrl) {
 .ew-item.confirm{color:#fff}
 .ew-item:active{transform:translateX(.2em) scale(.97)}
 .ew-style{display:inline-flex;gap:.3em;margin-left:.8em;vertical-align:middle}
-.ew-style span{padding:.2em .45em;background:#111a20;color:var(--dim);font-size:.85em}
-.ew-style span.on{background:var(--cyan);color:var(--line)}
+.ew-style span,.ew-renderer-options button{padding:.2em .45em;background:#111a20;color:var(--dim);font-size:.85em}
+.ew-renderer-options button{font-family:inherit;line-height:inherit;letter-spacing:inherit;border:0;cursor:var(--ew-cursor-action,pointer)}
+.ew-style span.on,.ew-renderer-options button[aria-pressed="true"]{background:var(--cyan);color:var(--line)}
+.ew-renderer-options button:disabled{opacity:.55;cursor:default}
+.ew-renderer-options button:focus-visible,.ew-renderer-actions button:focus-visible{outline:var(--p) solid var(--cyan);outline-offset:var(--p)}
+.ew-renderer-dialog{position:fixed;pointer-events:auto;color:var(--ink);background:#151f26;text-align:center;max-width:calc(100% - 2em)}
+.ew-renderer-dialog::backdrop{background:rgba(4,8,10,.65)}
+.ew-renderer-dialog h2{margin:0;font-weight:400}
+.ew-renderer-dialog p{margin:1em 0;font-size:.8em;line-height:1.3;color:var(--ink2)}
+.ew-renderer-actions{display:flex;justify-content:center;gap:.8em}
+.ew-menu-setting{display:flex;align-items:center;justify-content:space-between;gap:.9em}
+.ew-menu-setting>span{text-transform:uppercase}
+.ew-menu-setting select{font:inherit;font-size:.9em;color:var(--ink);background:#111a20;border:var(--p) solid var(--edge);
+  padding:.25em .45em;min-width:0;max-width:min(60%,38vw);cursor:var(--ew-cursor-action,pointer);color-scheme:dark}
+.ew-menu-setting select:focus-visible{outline:var(--p) solid var(--cyan);outline-offset:var(--p)}
 .ew-hint{margin-top:1em;font-family:'EW Pixelify',monospace;font-size:.6em;color:var(--dim);text-align:center}
+.ew-reload-hint+.ew-hint{margin-top:.3em}
 .ew-ctl{display:grid;grid-template-columns:auto auto;column-gap:1.4em;row-gap:.42em;margin-top:.9em;font-size:.62em}
 .ew-ctl .k{display:flex;gap:.3em;justify-content:flex-end;flex-wrap:nowrap;white-space:nowrap}
 .ew-ctl .k .ew-key{font-size:.9em;min-width:1.7em;height:1.7em}
