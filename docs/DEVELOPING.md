@@ -26,11 +26,11 @@ layout and the asset sources. The design is in `docs/DESIGN.md`; each part has i
 ## The fire is a module (decision `docs/decisions/0001-fire-modules-and-two-editions.md`)
 
 The fire lives in **fire modules** from **[Firewraith](https://github.com/lethehaiau/firewraith)**, installed as the
-`firewraith` package (`v.0.2.1`). It holds the Fire API, the kit, the reference modules (`classic`, the game's original
+`firewraith` package (`v0.3.0`). It holds the Fire API, the kit, the reference modules (`classic`, the game's original
 fire, and its WebGPU port `classic-webgpu`) and the module catalog: every module Firewraith lists is playable here with
 no change to the game. To write one, see Firewraith's
 [CONTRIBUTING.md](https://github.com/lethehaiau/firewraith/blob/main/CONTRIBUTING.md). To cite Firewraith, use the DOI of the version
-used here, v.0.2.1: [10.5281/zenodo.24476634](https://doi.org/10.5281/zenodo.24476634) (all versions:
+used here, v0.3.0: [10.5281/zenodo.24478877](https://doi.org/10.5281/zenodo.24478877) (all versions:
 [10.5281/zenodo.24362891](https://doi.org/10.5281/zenodo.24362891); see its `CITATION.cff`).
 
 - **The fire host** (`src/fire/`) picks a module for each **slot**:
