@@ -55,7 +55,8 @@
   </tr>
 </table>
 
-Press **P**, choose WebGL2 or WebGPU under **Renderer**, then confirm to reload with that renderer.
+Press **P**, choose WebGL2 or WebGPU under **Renderer**, then confirm to reload with that renderer. Under **Fire module**,
+pick another fire from [Firewraith](https://github.com/lethehaiau/firewraith), such as the Curved Volume Lance (WebGL2).
 
 ## Bring your own fire
 
@@ -108,7 +109,10 @@ gameplay grid, so **your fire decides what burns**, and a light map, so it light
 
 The step-by-step guide is **[Firewraith's CONTRIBUTING.md](https://github.com/lethehaiau/firewraith/blob/main/CONTRIBUTING.md)**.
 Try the two reference modules now: [`?firemod=classic`](https://valleyward.app/?firemod=classic) (WebGL2) and
-[`?firemod=classic-webgpu`](https://valleyward.app/?firemod=classic-webgpu) (WebGPU).
+[`?firemod=classic-webgpu`](https://valleyward.app/?firemod=classic-webgpu) (WebGPU). A module that fills one slot
+plays beside the reference module, as in
+[`?firemod=lance-curved-volume`](https://valleyward.app/?firemod=lance-curved-volume) (Curved Volume Lance over the
+classic ground fire).
 
 <p align="center">
   <img src="docs/assets/wall.jpg" width="49%" alt="From the wall walk: fire pours over the goblin horde at the gate, in the WebGPU edition.">

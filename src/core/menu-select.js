@@ -1,6 +1,7 @@
 /**
  * @typedef {{ id: string, label: string, disabled?: boolean, description?: string }} MenuChoice
- * @typedef {{ id: string, label: string, choices: MenuChoice[], selected: () => string, choose: (id: string) => void }} MenuSetting
+ * @typedef {{ id: string, label: string, choices: MenuChoice[], selected: () => string, choose: (id: string) => void,
+ *             customLabel?: string }} MenuSetting
  */
 
 /** @param {MenuSetting} setting */
@@ -13,7 +14,7 @@ export function createMenuSelect(setting) {
     option.disabled = !!choice.disabled;
     select.append(option);
   }
-  const other = new Option('Custom module', '');
+  const other = new Option(setting.customLabel ?? 'Custom module', '');
   other.disabled = true;
 
   function refresh() {

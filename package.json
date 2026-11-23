@@ -21,7 +21,7 @@
     "sbs": "node tools/qa/sbs.mjs"
   },
   "dependencies": {
-    "firewraith": "github:lethehaiau/firewraith#v0.2.0",
+    "firewraith": "github:lethehaiau/firewraith#v.0.2.1",
     "three": "0.186.1"
   },
   "devDependencies": {
