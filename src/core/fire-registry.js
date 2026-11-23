@@ -2,9 +2,12 @@
 // (`firewraith/modules`), so a module merged into Firewraith is listed here with no change to the game. Each module's
 // code is a separate chunk that loads only when it is picked. During development any module served from this machine
 // can be tried by URL: ?lance=http://localhost:5173/src/index.js (only localhost / 127.0.0.1 / [::1] URLs are accepted).
-// Each listed module is also a whole fire setup (?firemod=<id>, the P menu's Fire module): it fills the slots it declares
-// and the edition's reference module fills the rest, so a Lance-only module plays over the classic ground fire.
+// The P menu's Fire module and ?firemod=<id> pick a whole fire setup, one module per slot. Firewraith's setups
+// (`firewraith/setups`) name them. A module without one is a setup of its own: it fills the slots it declares and the
+// edition's reference module fills the rest, so a Lance-only module plays over the classic ground fire.
+import { checkSetup } from 'firewraith/api';
 import { MODULES } from 'firewraith/modules';
+import { SETUPS as FIREWRAITH_SETUPS } from 'firewraith/setups';
 
 // Vite only injects a startup Lance override for development.
 export const DEV_LANCE = typeof __EW_DEV_LANCE__ === 'undefined' ? '' : __EW_DEV_LANCE__;
@@ -18,8 +21,18 @@ const entries = Object.entries(MODULES).map(([id, m]) => [id, Object.freeze({
   name: m.info.name, backend: m.info.backend, slots: Object.freeze([...m.info.slots]), load: m.load,
 })]);
 export const REGISTRY = Object.freeze(Object.fromEntries(entries));
+const own = (table, id) => (Object.prototype.hasOwnProperty.call(table, id) ? table[id] : undefined);
 /** @param {string} id */
-const listed = (id) => (Object.prototype.hasOwnProperty.call(REGISTRY, id) ? REGISTRY[id] : undefined);
+const listed = (id) => own(REGISTRY, id);
+
+/** Firewraith's setups that check out against its catalog: id → { name, backend, slots }. A broken one is skipped. */
+export const SETUPS = Object.freeze(Object.fromEntries(Object.entries(FIREWRAITH_SETUPS).filter(([id, setup]) => {
+  const problems = checkSetup(id, setup, MODULES);
+  if (problems.length) console.warn(`[ew] Firewraith setup "${id}" skipped: ${problems.join('; ')}`);
+  return !problems.length;
+})));
+/** A setup's picks, in slot order. */
+const picksOf = (setup) => Object.fromEntries(SLOTS.map((slot) => [slot, setup.slots[slot]]));
 
 /** The module a slot falls back to, per edition (also the edition's default): classic, or its WebGPU port. */
 export const FALLBACK = Object.freeze({ webgl2: 'classic', webgpu: 'classic-webgpu' });
@@ -34,21 +47,33 @@ function editionModules(edition) {
     .sort(([a], [b]) => Number(b === ref) - Number(a === ref));
 }
 
-/** The slot picks of module `id` as a whole fire setup: its own slots, and the edition's reference module for the others.
- *  @param {string} id @param {string} edition */
-export function setupOf(id, edition) {
+/** The slot picks of setup `id`: Firewraith's setup of that id, else module `id` in the slots it declares and the
+ *  edition's reference module in the others. @param {string} id @param {string} edition */
+export function setupOf(id, edition, setups = SETUPS) {
+  const setup = own(setups, id);
+  if (setup?.backend === edition) return picksOf(setup);
   const fills = listed(id)?.slots ?? SLOTS, ref = fallbackFor(/** @type {any} */ (edition));
   return Object.fromEntries(SLOTS.map((slot) => [slot, fills.includes(slot) ? id : ref]));
 }
 
-/** The Fire module choices: one whole setup per listed module of the edition. @param {string} edition */
-export function setupOptions(edition) {
-  return editionModules(edition).map(([id, entry]) => ({ id, name: entry.name, picks: setupOf(id, edition) }));
+/** The Fire module choices of an edition: a setup per listed module (Firewraith's under the module's id, else its own),
+ *  then Firewraith's other setups. @param {string} edition */
+export function setupOptions(edition, setups = SETUPS) {
+  const modules = editionModules(edition).map(([id, entry]) => {
+    const setup = own(setups, id);
+    return { id, name: setup?.backend === edition ? setup.name : entry.name, picks: setupOf(id, edition, setups) };
+  });
+  const combos = Object.entries(setups)
+    .filter(([id, setup]) => setup.backend === edition && !listed(id))
+    .map(([id, setup]) => ({ id, name: setup.name, picks: picksOf(setup) }));
+  return [...modules, ...combos];
 }
 
-/** The setup that slot picks amount to, or '' for a custom mix. @param {Record<string, string>} picks @param {string} edition */
-export function setupFor(picks, edition) {
-  return setupOptions(edition).find((setup) => SLOTS.every((slot) => setup.picks[slot] === picks[slot]))?.id ?? '';
+/** The setup that slot picks amount to (`prefer` when it matches, as two setups may pick the same modules), or '' for a
+ *  custom mix. @param {Record<string, string>} picks @param {string} edition @param {string} [prefer] */
+export function setupFor(picks, edition, prefer = '', setups = SETUPS) {
+  const matches = setupOptions(edition, setups).filter((setup) => SLOTS.every((slot) => setup.picks[slot] === picks[slot]));
+  return (matches.find(({ id }) => id === prefer) ?? matches[0])?.id ?? '';
 }
 
 /** The listed modules of the edition that can fill one slot. @param {string} edition @param {string} slot */
@@ -86,12 +111,13 @@ export async function loadModule(id) {
   throw new Error(`no fire module "${id}" (listed: ${Object.keys(REGISTRY).join(', ')}; or a http://localhost URL)`);
 }
 
-/** Explicit slot picks, before applying defaults. ?firemod= asks for a whole setup: a listed module for the slots it
- *  declares (the reference module fills the others), a dev URL for both; ?lance= and ?ground= override one slot. */
-export function requestedModules(q) {
-  const setup = q.get('firemod') || '';
-  const fills = listed(setup)?.slots ?? SLOTS;
-  const from = (slot) => (setup && fills.includes(slot) ? setup : '');
+/** Explicit slot picks, before applying defaults. ?firemod= asks for a whole setup: Firewraith's setup of that id, a
+ *  listed module for the slots it declares (the reference module fills the others), or a dev URL for both; ?lance= and
+ *  ?ground= override one slot. */
+export function requestedModules(q, setups = SETUPS) {
+  const id = q.get('firemod') || '';
+  const setup = own(setups, id), fills = listed(id)?.slots ?? SLOTS;
+  const from = (slot) => (!id ? '' : setup ? setup.slots[slot] : fills.includes(slot) ? id : '');
   return { lance: q.get('lance') || from('lance'), ground: q.get('ground') || from('ground') };
 }
 
