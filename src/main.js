@@ -14,7 +14,9 @@ import { TIMELINE } from './shared/timeline.js';
 import { ARENA } from './shared/arena.js';
 import { pickEdition, loadGfx } from './gfx/index.js';
 import { setGfx } from './gfx/current.js';
-import { lanceOptions, pickedModules, rendererQuery } from './core/fire-registry.js';
+import {
+  SLOTS, pickedModules, rendererQuery, setupFor, setupOptions, setupQuery, slotOptions, slotQuery,
+} from './core/fire-registry.js';
 import { CARD_BY_ID } from './sim/cards.js';
 import { createInput, SENS } from './core/input.js';
 import { createTouch, createFullscreenControl, phoneTouches } from './core/touch.js';
@@ -332,18 +334,31 @@ function fireMenuSettings() {
     ],
     choose: (id) => reloadFireSettings(rendererQuery(query, id)),
   }];
-  const lances = import.meta.env.DEV ? lanceOptions(gfx.edition) : [];
-  if (lances.length > 1) {
+  // the module running in each slot (after any fallback), else the ones asked for
+  const running = () => {
+    const r = call('fire', 'report');
+    return r ? { lance: r.lance?.id ?? '', ground: r.ground?.id ?? '' } : pickedModules(query, gfx.edition);
+  };
+  // Fire module: a whole setup (the module in its own slots, the edition's reference module in the others)
+  const setups = setupOptions(gfx.edition);
+  if (setups.length > 1) {
     settings.push({
-      id: 'lance', label: 'Lance module',
-      selected: () => call('fire', 'report')?.lance?.id ?? pickedModules(query, gfx.edition).lance,
-      choices: lances.map(({ id, name }) => ({ id, label: name })),
-      choose(id) {
-        const next = new URLSearchParams(query);
-        next.set('lance', id);
-        reloadFireSettings(next);
-      },
+      id: 'firemod', label: 'Fire module', customLabel: 'Custom mix',
+      selected: () => setupFor(running(), gfx.edition),
+      choices: setups.map(({ id, name }) => ({ id, label: name })),
+      choose: (id) => reloadFireSettings(setupQuery(query, id)),
     });
+  }
+  // development's advanced picks: one module per slot
+  if (import.meta.env.DEV) {
+    for (const slot of SLOTS) {
+      settings.push({
+        id: slot, label: `${slot[0].toUpperCase()}${slot.slice(1)} module`,
+        selected: () => running()[slot],
+        choices: slotOptions(gfx.edition, slot).map(({ id, name }) => ({ id, label: name })),
+        choose: (id) => reloadFireSettings(slotQuery(query, slot, id)),
+      });
+    }
   }
   return settings;
 }

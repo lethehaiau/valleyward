@@ -1,8 +1,8 @@
 // VALLEYWARD · the fire host (the `fire` module; decision docs/decisions/0001). The fire itself lives in fire modules
 // (Firewraith's Fire API v1: firewraith/docs/API.md). This host:
 //   - picks a module for each slot (`lance`: the Ember Lance's airborne flame, `ground`: the fire on the ground) from
-//     ?lance= / ?ground= (?firemod= sets both; default: the edition's reference module, 'classic' in webgl2 and
-//     'classic-webgpu' in webgpu), loads it, and creates one instance per module;
+//     ?firemod= / ?lance= / ?ground= (src/core/fire-registry.js; default: the edition's reference module, 'classic' in
+//     webgl2 and 'classic-webgpu' in webgpu), loads it, and creates one instance per module;
 //   - falls back to that reference module for a slot whose module is missing, invalid, built for the other edition, or
 //     throws (while loading or later in a call); if the reference module itself throws, the fire host fails and main.js keeps
 //     the CPU fire grid and the greybox fire, as before;

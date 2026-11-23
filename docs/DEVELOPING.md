@@ -26,19 +26,21 @@ layout and the asset sources. The design is in `docs/DESIGN.md`; each part has i
 ## The fire is a module (decision `docs/decisions/0001-fire-modules-and-two-editions.md`)
 
 The fire lives in **fire modules** from **[Firewraith](https://github.com/lethehaiau/firewraith)**, installed as the
-`firewraith` package (`v0.2.0`). It holds the Fire API, the kit, the reference modules (`classic`, the game's original
+`firewraith` package (`v.0.2.1`). It holds the Fire API, the kit, the reference modules (`classic`, the game's original
 fire, and its WebGPU port `classic-webgpu`) and the module catalog: every module Firewraith lists is playable here with
 no change to the game. To write one, see Firewraith's
 [CONTRIBUTING.md](https://github.com/lethehaiau/firewraith/blob/main/CONTRIBUTING.md). To cite Firewraith, use the DOI of the version
-used here, v0.2.0: [10.5281/zenodo.24364837](https://doi.org/10.5281/zenodo.24364837) (all versions:
+used here, v.0.2.1: [10.5281/zenodo.24476634](https://doi.org/10.5281/zenodo.24476634) (all versions:
 [10.5281/zenodo.24362891](https://doi.org/10.5281/zenodo.24362891); see its `CITATION.cff`).
 
 - **The fire host** (`src/fire/`) picks a module for each **slot**:
   - `lance`: the Ember Lance's flame;
   - `ground`: the fire on the ground.
 
-  `?lance=` and `?ground=` choose them, and `?firemod=` sets both. Each takes a listed id (`classic`) or, for
-  development, a module URL on this machine (`http://localhost:…`).
+  `?firemod=` picks a whole setup: the module fills the slots it declares and the edition's reference module fills
+  the others, so `?firemod=lance-curved-volume` is that Lance over the classic ground fire. `?lance=` and `?ground=`
+  override one slot. Each takes a listed id (`classic`) or, for development, a module URL on this machine
+  (`http://localhost:…`, which `?firemod=` asks for in both slots).
 - **A module that is missing, invalid or throws** is replaced by `classic` for its slots.
 - **A `ground` module may decide what burns,** through its gameplay grid. Without one, the deterministic CPU fire grid
   (`src/sim/fireproxy.js`) decides.
@@ -46,9 +48,12 @@ used here, v0.2.0: [10.5281/zenodo.24364837](https://doi.org/10.5281/zenodo.2436
   picked modules' backend. `?gpu=webgl2|webgpu` forces one. The **Renderer** toggle in the **P** menu asks for
   confirmation before reloading the game and keeps compatible slot selections. WebGPU is disabled when the browser lacks its API.
 - **Local Firewraith modules.** Link the Firewraith checkout, add `modules/<id>/`, and register the same ID in
-  Firewraith's `modules/catalog.js`. Restart Valleyward's dev server and open `?lance=<id>` or `?ground=<id>`.
-  **P → Lance module** lists the compatible catalog entries in dev when there is more than one choice.
-  Selecting one reloads with `?lance=<id>`. To start with a catalog entry, run `VALLEYWARD_DEV_LANCE=<id> npm run dev`,
+  Firewraith's `modules/catalog.js`. Restart Valleyward's dev server and open `?firemod=<id>`, `?lance=<id>` or
+  `?ground=<id>`.
+- **P → Fire module** lists the edition's catalog modules as whole setups, in production too, when there is more than
+  one. Selecting one reloads with `?firemod=<id>`. A mix that matches no setup shows as **Custom mix**. In dev, the
+  advanced **Lance module** and **Ground module** rows pick one slot at a time and reload with `?lance=<id>` or
+  `?ground=<id>`. To start with a catalog entry, run `VALLEYWARD_DEV_LANCE=<id> npm run dev`,
   replacing `<id>` with the registered Lance ID. Explicit URL choices take precedence.
 - **The WebGPU edition is complete** (`docs/WEBGPU-PORT.md`). It runs three's `WebGPURenderer` with the world, the look,
   the actors, the fx and Firewraith's `classic-webgpu` fire, which is its default and fallback module. Its frame time
