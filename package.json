@@ -12,6 +12,7 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 5351 --strictPort",
     "test": "node --test tests/*.test.mjs",
+    "module:check": "tools/gpu-lock.sh node tools/qa/module-check.mjs",
     "e2e": "tools/gpu-lock.sh node tools/qa/e2e.mjs",
     "perf": "tools/gpu-lock.sh node tools/qa/perf.mjs",
     "shots": "tools/gpu-lock.sh node tools/qa/shots.mjs",

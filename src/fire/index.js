@@ -28,8 +28,8 @@ export async function createFire({ renderer, edition = 'webgl2', quality = 'high
   const world = edition === 'webgpu' ? Object.freeze({ ...makeWorld(), groundTSL: (await import('../gfx/webgpu/index.js')).ewGround }) : makeWorld();
   const FALLBACK = fallbackFor(edition);   // 'classic' in webgl2, 'classic-webgpu' in webgpu
   const want = { ...pickedModules(params, edition), ...(picks || {}) };
-  /** slot → { id, ok, state, reason } for __ew.modules() / stats */
-  const report = Object.fromEntries(SLOT_ORDER.map((s) => [s, { id: want[s], ok: false, state: 'pending', reason: '' }]));
+  /** slot → { requested, id, ok, state, reason } for diagnostics. id is the resolved module. */
+  const report = Object.fromEntries(SLOT_ORDER.map((s) => [s, { requested: want[s], id: want[s], ok: false, state: 'pending', reason: '' }]));
   /** @type {{ id: string, info: any, mod: any, slots: string[] }[]} */
   let insts = [];
   const S = { style: style === 'hybrid' ? 'hybrid' : 'smooth', quality, rain: 0, time: 0, disposed: false, swapping: 0 };
@@ -108,6 +108,10 @@ export async function createFire({ renderer, edition = 'webgl2', quality = 'high
     }
   }
   const ground = () => insts.find((i) => i.slots.includes('ground')) || null;
+  function instanceStats(inst) {
+    try { return inst?.mod.stats?.(); }
+    catch (e) { failed(inst, 'stats', e); }
+  }
 
   await build();
 
@@ -170,16 +174,17 @@ export async function createFire({ renderer, edition = 'webgl2', quality = 'high
     setQuality(q) { S.quality = q; each((m) => m.setQuality?.(q), 'setQuality'); },
     stats() {
       const g = ground();
-      let st = {};
-      try { st = g?.mod.stats?.() || {}; } catch (e) { if (g) failed(g, 'stats', e); }
-      const l = insts.find((i) => i !== g && i.slots.includes('lance'));
-      let lance;
-      try { lance = l?.mod.stats?.(); } catch (e) { if (l) failed(l, 'stats', e); }
-      return { ...st, ...(lance && { lance }), style: st.style ?? S.style, modules: api.report() };
+      const l = insts.find((i) => i.slots.includes('lance'));
+      const groundStats = instanceStats(g);
+      const lance = l === g ? groundStats : instanceStats(l);
+      return {
+        ...groundStats, ...(l !== g && lance && { lance }), style: groundStats?.style ?? S.style,
+        slots: { ground: groundStats ?? null, lance: lance ?? null }, modules: api.report(),
+      };
     },
     /** Does a module fill this slot? @param {'lance'|'ground'} slot */
     has(slot) { return insts.some((i) => i.slots.includes(slot)); },
-    /** slot → { id, ok, state ('loaded'|'fallback'|'empty'), reason }; plus each instance's info. */
+    /** slot → { requested, id, ok, state ('loaded'|'fallback'|'empty'), reason }; plus each instance's info. */
     report() { return { ...JSON.parse(JSON.stringify(report)), instances: insts.map((i) => ({ id: i.id, name: i.info.name, version: i.info.version, backend: i.info.backend, slots: i.slots })) }; },
     async warm(r, camera) { for (const inst of [...insts]) { try { await inst.mod.warm?.(r, camera); } catch (e) { failed(inst, 'warm', e); } } },
     reset() { each((m) => m.reset(), 'reset'); FIRELIGHT.nearCamera.setRGB(0, 0, 0); },

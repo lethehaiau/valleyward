@@ -14,11 +14,12 @@ import { TIMELINE } from './shared/timeline.js';
 import { ARENA } from './shared/arena.js';
 import { pickEdition, loadGfx } from './gfx/index.js';
 import { setGfx } from './gfx/current.js';
-import { devLanceOptions, pickedModules, rendererQuery } from './core/fire-registry.js';
+import { lanceOptions, pickedModules, rendererQuery } from './core/fire-registry.js';
 import { CARD_BY_ID } from './sim/cards.js';
 import { createInput, SENS } from './core/input.js';
 import { createShake } from './core/shake.js';
 import { createFrameMetrics } from './core/frame-metrics.js';
+import { createFireMetrics } from './core/fire-metrics.js';
 import { createResolutionGovernor, budgetDpr, createFrameCap, watchDpr } from './core/resolution.js';
 import { createOverlay } from './core/overlay.js';
 import { loadLane, failLane, present, report, prefetchLanes } from './core/modules.js';
@@ -120,8 +121,9 @@ greybox.setParts({ world: true, actors: true, fire: true, debugFire: P.debug });
 // the lens and what moves it: the rig (first person and the fixed views), shake, the viewmodel's motion, the box viewmodel
 const rig = createCameraRig(camera, { fov: P.fov }), shake = createShake();
 const motion = createMotion(), greyVM = createGreyViewmodel();
-// diagnostics (?perf=1, ?gpuPerf=1, ?debug=1)
-const metrics = createFrameMetrics(renderer, P.perf, P.gpuPerf), overlay = createOverlay({ debug: P.debug, perf: P.perf });
+// Fire-only queries take precedence over whole-frame and module queries on the same WebGL context.
+const fireTiming = createFireMetrics(renderer, P.firePerf);
+const metrics = createFrameMetrics(renderer, P.perf, P.gpuPerf && !fireTiming), overlay = createOverlay({ debug: P.debug, perf: P.perf });
 // the governor judges frames against the cap; uncapped (?fps=0) it keeps the full resolution
 const governorTarget = () => ({ target: P.fps > 0 ? 1 / P.fps : 0 });
 let governor = createResolutionGovernor(ceilingDpr, governorTarget());
@@ -299,8 +301,8 @@ function fireMenuSettings() {
     ],
     choose: (id) => reloadFireSettings(rendererQuery(query, id)),
   }];
-  const lances = devLanceOptions(gfx.edition);
-  if (lances.length) {
+  const lances = import.meta.env.DEV ? lanceOptions(gfx.edition) : [];
+  if (lances.length > 1) {
     settings.push({
       id: 'lance', label: 'Lance module',
       selected: () => call('fire', 'report')?.lance?.id ?? pickedModules(query, gfx.edition).lance,
@@ -357,7 +359,7 @@ async function loadParts() {
   const first = [
     ['env', (m) => m.createEnvironment({ renderer, scene, camera, quality, assetsBase })],
     ['look', (m) => m.createLook({ renderer, scene, camera, quality })],
-    ['fire', (m) => m.createFire({ renderer, edition: gfx.edition, quality, style: fireStyle, gpuTiming: P.gpuPerf })],
+    ['fire', (m) => m.createFire({ renderer, edition: gfx.edition, quality, style: fireStyle, gpuTiming: P.gpuPerf && !fireTiming })],
     ['actors', (m) => m.createActors({ scene, camera, quality, assetsBase, renderer })],
     ['ui', (m) => m.createUI(uiOptions()), false],
     ['audio', (m) => m.createAudio({ assetsBase }), false],
@@ -384,13 +386,21 @@ async function loadParts() {
   greybox.setParts({ world: !up.env, actors: !up.actors, fire: !up.fire || !part.fire.has('ground'), debugFire: P.debug });
   if (up.env && part.env.envMap) scene.environment = part.env.envMap;
   if (up.look) {
-    safe('look', 'setFluidPass', (l) => l.setFluidPass(up.fire ? part.fire.pass : null));
+    setFireComposite(true);
     safe('look', 'setViewmodel', (l) => l.setViewmodel(viewmodelPair()));
   }
   if (P.mute) audioApi.setVolume(0);
   audioApi.setFire?.(sim.fire);
   setFireStyle(fireStyle);
   setProgress(0.72, 0.86, 'LIGHTING THE LAMPS');
+}
+
+function setFireComposite(on) {
+  const pass = on && up.fire ? part.fire.pass : null;
+  const timedPass = fireTiming && pass ? {
+    render: (r, args) => fireTiming.measure('composite', () => pass.render(r, args)),
+  } : pass;
+  call('look', 'setFluidPass', timedPass);
 }
 
 // ================================================================================================ sim events -> everyone
@@ -692,6 +702,7 @@ function frame(now) {
   capFps = behindModal() ? MODAL_FPS : P.fps;
   if (!cap.draw(now, capFps)) return;   // a skipped display frame: nothing drawn, the sim catches up on the next one
   metrics.begin(now);
+  fireTiming?.beginFrame(now);
   renderer.info.reset();
   const elapsed = Math.max(0, (now - lastNow) / 1000);
   lastNow = now;
@@ -711,7 +722,8 @@ function frame(now) {
   ema('events', performance.now() - tEvents);
   const vdt = paused ? 0 : dt;            // presentation time
   const gameDt = paused ? 0 : steps * DT; // game time (speed, slow motion and hit-stop included)
-  driveFire(S, gameDt);
+  if (fireTiming) fireTiming.measure('update', () => driveFire(S, gameDt));
+  else driveFire(S, gameDt);
   scriptedBeats(S, paused, dt);
 
   // ---- presentation
@@ -757,6 +769,7 @@ function frame(now) {
     dpr, view: rig.view, bot: botOn, modules: report, lights: countLights(), simMs, ops: opsN, fireSource: S.fireSource,
   });
   metrics.end({ mode: S.mode, paused, dpr, width: innerWidth, height: innerHeight, horde: S.horde.alive });
+  fireTiming?.endFrame();
 }
 
 // ================================================================================================ the warm-up
@@ -880,6 +893,7 @@ function perfReport() {
     calls: drawCalls(), triangles: info.render.triangles, dpr, simMs: fixed(simMs, 2),
     programs: info.programs?.length ?? null, geometries: info.memory.geometries, textures: info.memory.textures,
     horde: sim.state.horde.alive, lanes, fire: up.fire ? call('fire', 'stats') : null,
+    ...(fireTiming && { fireTiming: fireTiming.report() }),
   };
 }
 /** ?debug=1: the ground module's gameplay grid against the CPU grid fed the same ops, sampled over ARENA.fluid at 64 × 64. */
@@ -952,7 +966,8 @@ window.__ew = {
   fireOp: (op) => sim.fireOp(op),
   fireStyle: (s) => (s ? setFireStyle(s) : fireStyle),
   perf: () => perfReport(),
-  resetPerf() { frameTimes.length = 0; },
+  resetPerf() { frameTimes.length = 0; fireTiming?.reset(); },
+  get fireFixture() { return import.meta.env.DEV && fireTiming ? { setComposite: setFireComposite } : null; },
   fireCompare: () => compareFires(),
   // DESIGN §9: the save and the loop
   save: () => sim.save(),

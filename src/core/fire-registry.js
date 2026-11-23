@@ -4,22 +4,18 @@
 // can be tried by URL: ?lance=http://localhost:5173/src/index.js (only localhost / 127.0.0.1 / [::1] URLs are accepted).
 import { MODULES } from 'firewraith/modules';
 
-// Vite injects this manifest at dev-server startup. Node tests and production builds use the bundled catalog.
-const local = typeof __EW_LOCAL_FIRE__ === 'undefined' ? { modules: [], lance: '' } : __EW_LOCAL_FIRE__;
-const devEntries = local.modules.map(({ id, name, backend, slots, url }) =>
-  [id, Object.freeze({ name, backend, slots: Object.freeze(slots), load: () => import(/* @vite-ignore */ url) })]);
-export const DEV_LANCE = local.lance;
+// Vite only injects a startup Lance override for development.
+export const DEV_LANCE = typeof __EW_DEV_LANCE__ === 'undefined' ? '' : __EW_DEV_LANCE__;
 
 /** id → { name, backend, slots, load }. `backend` and `slots` come from the module's light `info`, known before loading,
  *  so the game can boot the right edition. */
-const publishedEntries = Object.entries(MODULES).map(([id, m]) => [id, Object.freeze({
+const entries = Object.entries(MODULES).map(([id, m]) => [id, Object.freeze({
   name: m.info.name, backend: m.info.backend, slots: Object.freeze([...m.info.slots]), load: m.load,
 })]);
-export const REGISTRY = Object.freeze(Object.fromEntries([...publishedEntries, ...devEntries]));
+export const REGISTRY = Object.freeze(Object.fromEntries(entries));
 
-export function devLanceOptions(edition) {
-  if (!devEntries.some(([, entry]) => entry.backend === edition && entry.slots.includes('lance'))) return [];
-  return Object.entries(REGISTRY)
+export function lanceOptions(edition) {
+  return entries
     .filter(([, entry]) => entry.backend === edition && entry.slots.includes('lance'))
     .map(([id, entry]) => ({ id, name: entry.name }));
 }
